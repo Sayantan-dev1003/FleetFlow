@@ -1,44 +1,64 @@
 import React, { useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
+import { FiUser, FiBell } from 'react-icons/fi';
 
 export default function Topbar() {
   const { user } = useContext(AppContext);
+  const location = useLocation();
 
-  const getInitials = (name) => {
-    if (!name) return "U";
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  };
-
-  const getRoleColor = (role) => {
-    switch (role) {
-      case 'Fleet Manager': return { bg: 'bg-indigo-100 border-indigo-300 text-indigo-700', badge: 'bg-indigo-700' };
-      case 'Driver': return { bg: 'bg-blue-100 border-blue-300 text-blue-700', badge: 'bg-blue-700' };
-      case 'Safety Officer': return { bg: 'bg-emerald-100 border-emerald-300 text-emerald-700', badge: 'bg-emerald-700' };
-      case 'Financial Analyst': return { bg: 'bg-amber-100 border-amber-300 text-amber-700', badge: 'bg-amber-700' };
-      default: return { bg: 'bg-slate-100 border-slate-300 text-slate-700', badge: 'bg-slate-700' };
+  const getHeaderInfo = (pathname) => {
+    switch (pathname) {
+      case '/dashboard':
+        return { title: 'Operations Dashboard', subtitle: 'Real-time transport utilization, KPIs, and status metrics' };
+      case '/fleet':
+        return { title: 'Fleet Registry', subtitle: 'Manage vehicles database, license plates, and odometers' };
+      case '/drivers':
+        return { title: 'Drivers & Safety Roster', subtitle: 'Audit license compliance, expiry timelines, and safety indices' };
+      case '/trips':
+        return { title: 'Trip Dispatcher Ledger', subtitle: 'Orchestrate live dispatches, capacity checks, and complete logs' };
+      case '/maintenance':
+        return { title: 'Maintenance Registry', subtitle: 'Track vehicle repair statuses, service tickets, and costs' };
+      case '/expenses':
+        return { title: 'Fuel & Expenses Ledger', subtitle: 'Monitor fuel logs, toll purchases, and operational aggregates' };
+      case '/analytics':
+        return { title: 'Analytics & Reports', subtitle: 'Analyze aggregate fleet trends, ROIs, and CSV exports' };
+      case '/settings':
+        return { title: 'Compliance Control Panel', subtitle: 'Manage system configurations and compliance rules' };
+      default:
+        return { title: 'Operations Center', subtitle: 'TransitOps fleet management console' };
     }
   };
 
-  const name = user?.name || "Guest";
-  const role = user?.role || "Visitor";
-  const colors = getRoleColor(role);
-  const initials = getInitials(name);
+  const info = getHeaderInfo(location.pathname);
+
+  // Get initials
+  const getInitials = (n) => {
+    if (!n) return 'TO';
+    const parts = n.split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return n.slice(0, 2).toUpperCase();
+  };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 w-full shrink-0 shadow-sm">
-      {/* Target Global Context Field Mockup */}
-      <div className="w-72">
-       
+    <header className="bg-white border-b border-slate-200/80 px-8 py-4 flex justify-between items-center shrink-0 select-none">
+      <div className="text-left">
+        <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">{info.title}</h2>
+        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide mt-0.5">{info.subtitle}</p>
       </div>
+      
+      <div className="flex items-center gap-4">
+     
 
-      {/* User Status Profile Metadata Selector */}
-      <div className="flex items-center gap-3">
-        <span className="text-xs font-bold text-slate-600 tracking-tight">{name}</span>
-        <div className={`h-8 px-2 border rounded flex items-center justify-center text-[10px] font-bold tracking-wider gap-1.5 ${colors.bg}`}>
-          {role} 
-          <span className={`font-black text-white px-1 py-0.5 rounded-sm ${colors.badge}`}>
-            {initials}
-          </span>
+        {/* Profile widget */}
+        <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
+          <div className="text-right hidden sm:block">
+            <p className="text-xs font-black text-slate-800">{user?.name || 'Administrator'}</p>
+            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{user?.role || 'Safety Officer'}</p>
+          </div>
+          <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-black text-xs text-slate-950 uppercase tracking-widest shadow-xs">
+            {getInitials(user?.name)}
+          </div>
         </div>
       </div>
     </header>

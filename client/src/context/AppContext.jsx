@@ -145,6 +145,8 @@ export function AppProvider({ children }) {
   const { data: rawMaintenance = [] } = useQuery({ queryKey: ['maintenance'], queryFn: () => apiFetch('/maintenance'), enabled: !!user });
   const { data: rawFuel = [] } = useQuery({ queryKey: ['fuel-logs'], queryFn: () => apiFetch('/fuel-logs'), enabled: !!user });
   const { data: rawExpenses = [] } = useQuery({ queryKey: ['expenses'], queryFn: () => apiFetch('/expenses'), enabled: !!user });
+  const { data: rawSettings = null } = useQuery({ queryKey: ['settings'], queryFn: () => apiFetch('/settings'), enabled: !!user });
+  const settings = rawSettings?.data || { depotName: "Gandhinagar Depot GJ14", currency: "INR (₹)", distanceUnit: "Kilometers (km)" };
 
   const vehicles = Array.isArray(rawVehicles) ? rawVehicles.map(mapVehicleToUI) : (rawVehicles?.vehicles || []).map(mapVehicleToUI);
   const drivers = Array.isArray(rawDrivers) ? rawDrivers.map(mapDriverToUI) : (rawDrivers?.drivers || []).map(mapDriverToUI);
@@ -284,6 +286,22 @@ export function AppProvider({ children }) {
     } catch (err) { return { success: false, error: err.message }; }
   };
 
+  const updateSettingsMut = useMutation({
+    mutationFn: (payload) => apiFetch('/settings', { method: 'PUT', body: JSON.stringify(payload) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings'] });
+    }
+  });
+
+  const updateSettings = async (payload) => {
+    try {
+      await updateSettingsMut.mutateAsync(payload);
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
+  };
+
   return (
     <AppContext.Provider value={{
       user, login, logout, registerUser,
@@ -293,6 +311,7 @@ export function AppProvider({ children }) {
       maintenanceLogs, addMaintenanceLog, completeMaintenanceLog,
       fuelLogs, addFuelLogManual,
       expenses, addExpenseManual,
+      settings, updateSettings,
       accountLocked
     }}>
       {children}

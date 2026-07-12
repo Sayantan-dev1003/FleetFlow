@@ -113,12 +113,8 @@ export default function Analytics() {
 
   return (
     <div className="space-y-6 text-left animate-fadeIn">
-      {/* Top Header Block with CSV Export Button */}
-      <div className="flex justify-between items-center border-b border-slate-200/80 pb-4 flex-wrap gap-4">
-        <div>
-          <h2 className="text-base font-black text-slate-800 uppercase tracking-wider">Reports & Analytics Dashboard</h2>
-          <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Real-time dynamic fleet performance metrics</p>
-        </div>
+      {/* Export Action Strip */}
+      <div className="flex justify-end border-b border-slate-200/60 pb-4">
         <button 
           onClick={handleExportCSV}
           className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-slate-950 px-5 py-2.5 rounded-lg font-black text-xs uppercase tracking-wider transition shadow hover:scale-102 cursor-pointer"
