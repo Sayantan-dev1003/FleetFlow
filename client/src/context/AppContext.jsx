@@ -111,20 +111,54 @@ export function AppProvider({ children }) {
 
   const logout = () => setUser(null);
 
+  const registerUser = async (name, email, password, roleName) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, roleName })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error?.message || data.error || 'Registration failed');
+      }
+
+      // Automatically log the user in after registration
+      const uiRole = mapRoleToUI(data.data.user.role.name);
+      setUser({
+        id: data.data.user.id,
+        name: data.data.user.name,
+        email: data.data.user.email,
+        role: uiRole,
+        token: data.data.token
+      });
+
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
   // --- Queries ---
   const { data: rawVehicles = [] } = useQuery({ queryKey: ['vehicles'], queryFn: () => apiFetch('/vehicles'), enabled: !!user });
   const { data: rawDrivers = [] } = useQuery({ queryKey: ['drivers'], queryFn: () => apiFetch('/drivers'), enabled: !!user });
   const { data: rawMaintenance = [] } = useQuery({ queryKey: ['maintenance'], queryFn: () => apiFetch('/maintenance'), enabled: !!user });
   const { data: rawFuel = [] } = useQuery({ queryKey: ['fuel-logs'], queryFn: () => apiFetch('/fuel-logs'), enabled: !!user });
   const { data: rawExpenses = [] } = useQuery({ queryKey: ['expenses'], queryFn: () => apiFetch('/expenses'), enabled: !!user });
-  const { data: rawTrips = [] } = useQuery({ queryKey: ['trips'], queryFn: () => apiFetch('/trips'), enabled: !!user && rawVehicles.length > 0 && rawDrivers.length > 0 });
 
-  const vehicles = rawVehicles.map(mapVehicleToUI);
-  const drivers = rawDrivers.map(mapDriverToUI);
-  const maintenanceLogs = rawMaintenance.map(m => mapMaintenanceToUI(m, vehicles));
-  const fuelLogs = rawFuel.map(f => mapFuelLogToUI(f, vehicles));
-  const expenses = rawExpenses.map(e => mapExpenseToUI(e, vehicles));
-  const trips = rawTrips.map(t => mapTripToUI(t, vehicles, drivers));
+  const vehicles = Array.isArray(rawVehicles) ? rawVehicles.map(mapVehicleToUI) : (rawVehicles?.vehicles || []).map(mapVehicleToUI);
+  const drivers = Array.isArray(rawDrivers) ? rawDrivers.map(mapDriverToUI) : (rawDrivers?.drivers || []).map(mapDriverToUI);
+
+  const { data: rawTrips = [] } = useQuery({ 
+    queryKey: ['trips'], 
+    queryFn: () => apiFetch('/trips'), 
+    enabled: !!user && vehicles.length > 0 && drivers.length > 0 
+  });
+
+  const maintenanceLogs = Array.isArray(rawMaintenance) ? rawMaintenance.map(m => mapMaintenanceToUI(m, vehicles)) : (rawMaintenance?.logs || []).map(m => mapMaintenanceToUI(m, vehicles));
+  const fuelLogs = Array.isArray(rawFuel) ? rawFuel.map(f => mapFuelLogToUI(f, vehicles)) : (rawFuel?.logs || []).map(f => mapFuelLogToUI(f, vehicles));
+  const expenses = Array.isArray(rawExpenses) ? rawExpenses.map(e => mapExpenseToUI(e, vehicles)) : (rawExpenses?.expenses || []).map(e => mapExpenseToUI(e, vehicles));
+  const trips = Array.isArray(rawTrips) ? rawTrips.map(t => mapTripToUI(t, vehicles, drivers)) : (rawTrips?.trips || []).map(t => mapTripToUI(t, vehicles, drivers));
 
   const getVehicleId = (regNo) => vehicles.find(v => v.regNo === regNo)?.id;
   const getDriverId = (licenseNo) => drivers.find(d => d.licenseNo === licenseNo)?.id;
@@ -252,7 +286,7 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      user, login, logout,
+      user, login, logout, registerUser,
       vehicles, addVehicle, updateVehicle, deleteVehicle,
       drivers, addDriver, updateDriver, deleteDriver,
       trips, createTrip, dispatchTrip, completeTrip, cancelTrip,
