@@ -32,6 +32,7 @@ export default function Trips() {
   const [fuelConsumed, setFuelConsumed] = useState(0);
   const [tollCost, setTollCost] = useState(120);
   const [otherCost, setOtherCost] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Filter lists for the dropdown selectors
   const availableVehicles = vehicles.filter(v => v.status === 'Available');
@@ -65,15 +66,17 @@ export default function Trips() {
     setRevenue(val * 120); // standard rate 120 INR/km
   };
 
-  const handleCreateDraft = (e) => {
+  const handleCreateDraft = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
     if (!selectedVehicleReg || !selectedDriverLicense) {
       toast.error('Please select a valid Available vehicle and driver.');
       return;
     }
 
-    const res = createTrip({
+    setIsSubmitting(true);
+    const res = await createTrip({
       source,
       destination,
       vehicleRegNo: selectedVehicleReg,
@@ -82,9 +85,10 @@ export default function Trips() {
       plannedDistance,
       revenue
     });
+    setIsSubmitting(false);
 
     if (res.success) {
-      toast.success(`Draft Trip ${res.trip.id} created successfully! Dispatch it below.`);
+      toast.success(`Draft Trip ${res.trip?.id ? res.trip.id.slice(0, 8).toUpperCase() : ''} created successfully! Dispatch it below.`);
       // Reset form options
       setSource('Gandhinagar Depot');
       setDestination('Ahmedabad Hub');
@@ -96,8 +100,8 @@ export default function Trips() {
     }
   };
 
-  const handleDispatchDirect = (tripId) => {
-    const res = dispatchTrip(tripId);
+  const handleDispatchDirect = async (tripId) => {
+    const res = await dispatchTrip(tripId);
     if (!res.success) {
       toast.error(`Dispatch Error: ${res.error}`);
     } else {
@@ -114,10 +118,10 @@ export default function Trips() {
     setOtherCost(0);
   };
 
-  const handleCompleteSubmit = (e) => {
+  const handleCompleteSubmit = async (e) => {
     e.preventDefault();
 
-    const res = completeTrip(
+    const res = await completeTrip(
       activeCompletingTrip.id,
       Number(finalOdometer),
       Number(fuelConsumed),
@@ -133,18 +137,19 @@ export default function Trips() {
     }
   };
 
-  const handleCancelTrip = (tripId) => {
+  const handleCancelTrip = async (tripId) => {
     if (window.confirm(`Are you sure you want to cancel Trip ${tripId}?`)) {
-      cancelTrip(tripId);
+      await cancelTrip(tripId);
       toast.success(`Trip ${tripId} cancelled`);
     }
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
+    <>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
       
-      {/* Left Form Section (5 Columns) */}
-      <div className="lg:col-span-5 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit space-y-6 text-left">
+        {/* Left Form Section (5 Columns) */}
+        <div className="lg:col-span-5 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-fit space-y-6 text-left">
         
         {/* Trip Lifecycle Visual Tracker */}
         <div>
@@ -280,14 +285,14 @@ export default function Trips() {
           <div className="flex gap-4 pt-2">
             <button 
               type="submit"
-              disabled={isWeightExceeded || !selectedVehicleReg || !selectedDriverLicense} 
+              disabled={isWeightExceeded || !selectedVehicleReg || !selectedDriverLicense || isSubmitting} 
               className={`flex-1 py-3 rounded-lg font-black text-xs uppercase tracking-widest transition shadow hover:scale-101 cursor-pointer ${
-                isWeightExceeded || !selectedVehicleReg || !selectedDriverLicense
+                (isWeightExceeded || !selectedVehicleReg || !selectedDriverLicense || isSubmitting)
                   ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200' 
                   : 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-sm'
               }`}
             >
-              Create Draft
+              {isSubmitting ? 'Creating...' : 'Create Draft'}
             </button>
           </div>
         </form>
@@ -421,10 +426,13 @@ export default function Trips() {
         </div>
       </div>
 
+      </div>
+      
       {/* Complete Trip Pop-up Modal Form */}
       {activeCompletingTrip && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-fadeIn p-4">
-          <div className="bg-white p-6 rounded-xl border border-slate-200 w-full max-w-sm shadow-2xl text-left">
+        <div className="fixed inset-0 z-[999] w-screen overflow-y-auto bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <div className="bg-white p-6 rounded-xl border border-slate-200 w-full max-w-sm shadow-2xl text-left relative my-8">
             <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider mb-2 border-b border-slate-100 pb-2">
               Complete Trip Log
             </h3>
@@ -495,9 +503,10 @@ export default function Trips() {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

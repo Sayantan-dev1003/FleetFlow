@@ -59,11 +59,11 @@ export default function Drivers() {
     setIsModalOpen(true);
   };
 
-  const isDuplicateLicense = !isEditMode && drivers.some(
+  const isDuplicateLicense = !isEditMode && licenseNo.trim() !== '' && drivers.some(
     d => d.licenseNo.trim().toUpperCase() === licenseNo.trim().toUpperCase()
   );
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!name.trim() || !licenseNo.trim() || !expiry.trim()) {
@@ -72,11 +72,15 @@ export default function Drivers() {
     }
 
     if (isEditMode) {
-      updateDriver(licenseNo, { name, category, expiry, contact, tripsCompleted, safetyScore, status });
-      toast.success('Driver updated successfully');
-      setIsModalOpen(false);
+      const res = await updateDriver(licenseNo, { name, category, expiry, contact, tripsCompleted, safetyScore, status });
+      if (res.success) {
+        toast.success('Driver updated successfully');
+        setIsModalOpen(false);
+      } else {
+        toast.error(res.error || 'Failed to update driver');
+      }
     } else {
-      const res = addDriver({ name, licenseNo, category, expiry, contact, tripsCompleted, safetyScore, status });
+      const res = await addDriver({ name, licenseNo, category, expiry, contact, tripsCompleted, safetyScore, status });
       if (res.success) {
         toast.success('Driver added successfully');
         setIsModalOpen(false);
@@ -121,14 +125,15 @@ export default function Drivers() {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <>
+      <div className="space-y-6 animate-fadeIn">
       
-      {/* Top Controller Ribbon */}
-      <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 flex flex-col xl:flex-row xl:items-center justify-between gap-5 shadow-sm">
-        
-        {/* Search & Filters */}
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-          <div className="relative group w-full md:w-72">
+        {/* Top Controller Ribbon */}
+        <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 flex flex-col xl:flex-row xl:items-center justify-between gap-5 shadow-sm">
+          
+          {/* Search & Filters */}
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+            <div className="relative group w-full md:w-72">
             <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
             <input 
               type="text" 
@@ -442,10 +447,13 @@ export default function Drivers() {
         <p>Driver license compliance validation is active. Drivers with expired licenses are dynamically flagged in red and blocked from receiving new trip dispatches via the dispatch portal.</p>
       </div>
 
+      </div>
+
       {/* Create / Edit Modal Popup (Light Theme Refined) */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4 overflow-y-auto">
-          <div className="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 w-full max-w-lg shadow-2xl relative my-8">
+        <div className="fixed inset-0 z-[999] w-screen overflow-y-auto bg-slate-900/40 backdrop-blur-sm animate-fadeIn">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <div className="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 w-full max-w-lg shadow-2xl relative text-left my-8">
             <h3 className="text-base font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
               <FiCheckCircle className="text-amber-500" />
               {isEditMode ? 'Edit Driver Profile' : 'Register New Driver'}
@@ -541,7 +549,8 @@ export default function Drivers() {
                     min="0"
                     value={tripsCompleted} 
                     onChange={(e) => setTripsCompleted(Number(e.target.value))} 
-                    className="w-full px-4 py-2.5 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500 transition-all shadow-sm" 
+                    disabled={true}
+                    className="w-full px-4 py-2.5 text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200 rounded-xl outline-none cursor-not-allowed shadow-sm" 
                   />
                 </div>
 
@@ -550,12 +559,15 @@ export default function Drivers() {
                   <select 
                     value={status} 
                     onChange={(e) => setStatus(e.target.value)} 
-                    className="w-full px-4 py-2.5 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500 transition-all shadow-sm cursor-pointer"
+                    disabled={status === 'On Trip'}
+                    className={`w-full px-4 py-2.5 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500 transition-all shadow-sm ${
+                      status === 'On Trip' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                    }`}
                   >
                     <option value="Available">Available</option>
-                    <option value="On Trip">On Trip</option>
                     <option value="Off Duty">Off Duty</option>
                     <option value="Suspended">Suspended</option>
+                    {status === 'On Trip' && <option value="On Trip">On Trip</option>}
                   </select>
                 </div>
               </div>
@@ -581,9 +593,10 @@ export default function Drivers() {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

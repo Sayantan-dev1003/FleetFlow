@@ -54,11 +54,11 @@ export default function Fleet() {
   };
 
   // Validate duplicate registration numbers in real-time
-  const isDuplicateReg = !isEditMode && vehicles.some(
+  const isDuplicateReg = !isEditMode && regNo.trim() !== '' && vehicles.some(
     v => v.regNo.trim().toUpperCase() === regNo.trim().toUpperCase()
   );
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!regNo.trim() || !name.trim()) {
@@ -67,11 +67,15 @@ export default function Fleet() {
     }
 
     if (isEditMode) {
-      updateVehicle(regNo, { name, type, capacity, odometer, acqCost, status, region });
-      toast.success('Vehicle updated successfully');
-      setIsModalOpen(false);
+      const res = await updateVehicle(regNo, { name, type, capacity, odometer, acqCost, status, region });
+      if (res.success) {
+        toast.success('Vehicle updated successfully');
+        setIsModalOpen(false);
+      } else {
+        toast.error(res.error || 'Failed to update vehicle');
+      }
     } else {
-      const res = addVehicle({ regNo, name, type, capacity, odometer, acqCost, status, region });
+      const res = await addVehicle({ regNo, name, type, capacity, odometer, acqCost, status, region });
       if (res.success) {
         toast.success('Vehicle added successfully');
         setIsModalOpen(false);
@@ -102,8 +106,9 @@ export default function Fleet() {
   });
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-      {/* Top Filter and Actions Bar */}
+    <>
+      <div className="space-y-6 animate-fadeIn">
+        {/* Top Filter and Actions Bar */}
       <div className="bg-white p-5 rounded-xl border border-slate-200/80 flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-500 uppercase tracking-wider">
           <div className="flex flex-col gap-1">
@@ -236,10 +241,13 @@ export default function Fleet() {
         <span>Registration keys are database unique. "In Shop" and "Retired" vehicles are automatically filtered from the Dispatch ledger.</span>
       </div>
 
+      </div>
+
       {/* Create / Edit Modal Popup */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-fadeIn p-4">
-          <div className="bg-white p-6 rounded-xl border border-slate-200 w-full max-w-md shadow-2xl relative">
+        <div className="fixed inset-0 z-[999] w-screen overflow-y-auto bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <div className="bg-white p-6 rounded-xl border border-slate-200 w-full max-w-md shadow-2xl relative text-left my-8">
             <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
               {isEditMode ? 'Edit Vehicle Profile' : 'Register New Vehicle'}
             </h3>
@@ -307,7 +315,10 @@ export default function Fleet() {
                     type="number" 
                     value={odometer}
                     onChange={(e) => setOdometer(Number(e.target.value))}
-                    className="w-full mt-1.5 px-3 py-2 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500"
+                    disabled={isEditMode}
+                    className={`w-full mt-1.5 px-3 py-2 text-xs border rounded-lg outline-none font-semibold ${
+                      isEditMode ? 'bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed' : 'bg-slate-50 border-slate-200 focus:ring-1 focus:ring-amber-500'
+                    }`}
                   />
                 </div>
 
@@ -339,12 +350,15 @@ export default function Fleet() {
                   <select 
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full mt-1.5 px-3 py-2 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500 cursor-pointer"
+                    disabled={status === 'On Trip' || status === 'In Shop'}
+                    className={`w-full mt-1.5 px-3 py-2 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500 ${
+                      (status === 'On Trip' || status === 'In Shop') ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                    }`}
                   >
                     <option value="Available">Available</option>
-                    <option value="On Trip">On Trip</option>
-                    <option value="In Shop">In Shop</option>
                     <option value="Retired">Retired</option>
+                    {status === 'On Trip' && <option value="On Trip">On Trip</option>}
+                    {status === 'In Shop' && <option value="In Shop">In Shop</option>}
                   </select>
                 </div>
               </div>
@@ -366,9 +380,10 @@ export default function Fleet() {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -27,63 +27,63 @@
 ---
 
 ## 2. Dashboard (Spec 3.2)
-- [ ] KPI — Active Vehicles: count is correct
-- [ ] KPI — Available Vehicles: count is correct
-- [ ] KPI — Vehicles in Maintenance: count is correct
-- [ ] KPI — Active Trips: count is correct
-- [ ] KPI — Pending Trips: count is correct
-- [ ] KPI — Drivers On Duty: count is correct
-- [ ] KPI — Fleet Utilization (%): value matches the formula actually used, and is internally consistent with the vehicle status counts
-- [ ] Filter by **vehicle type** updates the relevant KPIs/lists
-- [ ] Filter by **status** updates the relevant KPIs/lists
-- [ ] Filter by **region** updates the relevant KPIs/lists
-- [ ] KPIs reflect a state change (e.g. dispatching a trip) without requiring a manual hard refresh, or at minimum update correctly on refresh
+- [ DONE ] KPI — Active Vehicles: count is correct
+- [ DONE ] KPI — Available Vehicles: count is correct
+- [ DONE ] KPI — Vehicles in Maintenance: count is correct
+- [ DONE ] KPI — Active Trips: count is correct
+- [ DONE ] KPI — Pending Trips: count is correct
+- [ DONE ] KPI — Drivers On Duty: count is correct
+- [ DONE ] KPI — Fleet Utilization (%): value matches the formula actually used, and is internally consistent with the vehicle status counts
+- [ DONE ] Filter by **vehicle type** updates the relevant KPIs/lists
+- [ DONE ] Filter by **status** updates the relevant KPIs/lists
+- [ DONE ] Filter by **region** updates the relevant KPIs/lists
+- [ DONE ] KPIs reflect a state change (e.g. dispatching a trip) without requiring a manual hard refresh, or at minimum update correctly on refresh
 
 ---
 
 ## 3. Vehicle Registry (Spec 3.3)
-- [ ] Create vehicle captures: Registration Number, Name/Model, Type, Max Load Capacity, Odometer, Acquisition Cost, Status
-- [ ] **Duplicate registration number is rejected** (Rule 1)
-- [ ] List view shows all vehicles with correct field values
-- [ ] Edit vehicle works and persists changes
-- [ ] Delete / Retire vehicle works
-- [ ] Status is restricted to exactly: `Available`, `On Trip`, `In Shop`, `Retired` — no free text or invalid values reach the DB
-- [ ] Status **cannot be manually set** to `On Trip` or `In Shop` from a create/edit form — those are system-derived only
+- [ DONE ] Create vehicle captures: Registration Number, Name/Model, Type, Max Load Capacity, Odometer, Acquisition Cost, Status
+- [ DONE ] **Duplicate registration number is rejected** (Rule 1)
+- [ DONE ] List view shows all vehicles with correct field values
+- [ DONE ] Edit vehicle works and persists changes
+- [ DONE ] Delete / Retire vehicle works
+- [ DONE ] Status is restricted to exactly: `Available`, `On Trip`, `In Shop`, `Retired` — no free text or invalid values reach the DB
+- [ DONE ] Status **cannot be manually set** to `On Trip` or `In Shop` from a create/edit form — those are system-derived only
 
 ---
 
 ## 4. Driver Management (Spec 3.4)
-- [ ] Create driver captures: Name, License Number, License Category, License Expiry Date, Contact Number, Safety Score, Status
-- [ ] List view shows all drivers with correct field values
-- [ ] Edit driver works and persists changes
-- [ ] Delete / deactivate driver works
-- [ ] Status is restricted to exactly: `Available`, `On Trip`, `Off Duty`, `Suspended`
+- [ DONE ] Create driver captures: Name, License Number, License Category, License Expiry Date, Contact Number, Safety Score, Status
+- [ DONE ] List view shows all drivers with correct field values
+- [ DONE ] Edit driver works and persists changes
+- [ DONE ] Delete / deactivate driver works
+- [ DONE ] Status is restricted to exactly: `Available`, `On Trip`, `Off Duty`, `Suspended`
 
 ---
 
 ## 5. Trip Management + Business Rules (Spec 3.5 + Section 4, Rules 1–8)
-- [ ] Create trip (→ `Draft`) captures: source, destination, vehicle, driver, cargo weight, planned distance
-- [ ] Vehicle dropdown at trip creation shows **only** available vehicles
-- [ ] **Retired vehicle never appears** in the dispatch/vehicle selection (test explicitly: retire a vehicle, confirm it vanishes from the dropdown)
-- [ ] **In Shop vehicle never appears** in the dispatch/vehicle selection (test explicitly: open a maintenance record on a vehicle, confirm it vanishes)
-- [ ] Driver dropdown shows **only** available drivers
-- [ ] Driver with an **expired license** cannot be selected/assigned (test with a seeded expired-license driver)
-- [ ] **Suspended** driver cannot be selected/assigned
-- [ ] Vehicle already `On Trip` **cannot** be double-booked onto a second trip
-- [ ] Driver already `On Trip` **cannot** be double-booked onto a second trip
-- [ ] Cargo weight **exceeding** vehicle max load capacity blocks trip creation/dispatch with a clear error
-- [ ] Cargo weight **exactly equal** to capacity is allowed (boundary case — rule is `≤`, not `<`)
-- [ ] **Dispatch**: `Draft → Dispatched` transition succeeds
-- [ ] **Dispatch**: vehicle status auto-flips to `On Trip`
-- [ ] **Dispatch**: driver status auto-flips to `On Trip`
-- [ ] **Complete**: requires final odometer reading + fuel consumed as input
-- [ ] **Complete**: `Dispatched → Completed` transition succeeds
-- [ ] **Complete**: vehicle status auto-reverts to `Available`
-- [ ] **Complete**: driver status auto-reverts to `Available`
-- [ ] **Cancel a Dispatched trip**: status → `Cancelled`, vehicle & driver restored to `Available`
-- [ ] **Cancel a Draft trip**: works cleanly with no vehicle/driver side effects (nothing was locked yet)
-- [ ] Illegal transitions are blocked (e.g. a `Completed` or `Cancelled` trip cannot be dispatched again)
-- [ ] Spot-check for race conditions: two rapid dispatch attempts on the same vehicle/driver — only one should win, not both
+- [ DONE ] Create trip (→ `Draft`) captures: source, destination, vehicle, driver, cargo weight, planned distance
+- [ DONE ] Vehicle dropdown at trip creation shows **only** available vehicles
+- [ DONE ] **Retired vehicle never appears** in the dispatch/vehicle selection (test explicitly: retire a vehicle, confirm it vanishes from the dropdown)
+- [ DONE ] **In Shop vehicle never appears** in the dispatch/vehicle selection (test explicitly: open a maintenance record on a vehicle, confirm it vanishes)
+- [ DONE ] Driver dropdown shows **only** available drivers
+- [ DONE ] Driver with an **expired license** cannot be selected/assigned (test with a seeded expired-license driver)
+- [ DONE ] **Suspended** driver cannot be selected/assigned
+- [ DONE ] Vehicle already `On Trip` **cannot** be double-booked onto a second trip
+- [ DONE ] Driver already `On Trip` **cannot** be double-booked onto a second trip
+- [ DONE ] Cargo weight **exceeding** vehicle max load capacity blocks trip creation/dispatch with a clear error
+- [ DONE ] Cargo weight **exactly equal** to capacity is allowed (boundary case — rule is `≤`, not `<`)
+- [ DONE ] **Dispatch**: `Draft → Dispatched` transition succeeds
+- [ DONE ] **Dispatch**: vehicle status auto-flips to `On Trip`
+- [ DONE ] **Dispatch**: driver status auto-flips to `On Trip`
+- [ DONE ] **Complete**: requires final odometer reading + fuel consumed as input
+- [ DONE ] **Complete**: `Dispatched → Completed` transition succeeds
+- [ DONE ] **Complete**: vehicle status auto-reverts to `Available`
+- [ DONE ] **Complete**: driver status auto-reverts to `Available`
+- [ DONE ] **Cancel a Dispatched trip**: status → `Cancelled`, vehicle & driver restored to `Available`
+- [ DONE ] **Cancel a Draft trip**: works cleanly with no vehicle/driver side effects (nothing was locked yet)
+- [ DONE ] Illegal transitions are blocked (e.g. a `Completed` or `Cancelled` trip cannot be dispatched again)
+- [ DONE ] Spot-check for race conditions: two rapid dispatch attempts on the same vehicle/driver — only one should win, not both
 
 ---
 
@@ -132,25 +132,25 @@ Run this as one continuous session; it catches integration bugs that isolated mo
 ---
 
 ## 10. Expected Database Entities (Spec Section 6)
-- [ ] `Users` table/model exists and is populated
-- [ ] `Roles` (table or enum) exists with all 4 roles represented
-- [ ] `Vehicles` table exists with all required fields
-- [ ] `Drivers` table exists with all required fields
-- [ ] `Trips` table exists with all required fields
-- [ ] `Maintenance Logs` table exists
-- [ ] `Fuel Logs` table exists
-- [ ] `Expenses` table exists
-- [ ] Relations are correctly wired: Trips↔Vehicles, Trips↔Drivers, Fuel Logs↔Vehicles, Maintenance Logs↔Vehicles, Expenses↔Vehicles
+- [ DONE ] `Users` table/model exists and is populated
+- [ DONE ] `Roles` (table or enum) exists with all 4 roles represented
+- [ DONE ] `Vehicles` table exists with all required fields
+- [ DONE ] `Drivers` table exists with all required fields
+- [ DONE ] `Trips` table exists with all required fields
+- [ DONE ] `Maintenance Logs` table exists
+- [ DONE ] `Fuel Logs` table exists
+- [ DONE ] `Expenses` table exists
+- [ DONE ] Relations are correctly wired: Trips↔Vehicles, Trips↔Drivers, Fuel Logs↔Vehicles, Maintenance Logs↔Vehicles, Expenses↔Vehicles
 
 ---
 
 ## 11. Mandatory Deliverables (Spec Section 7)
 - [ ] Responsive web interface (check mobile width, tablet width, desktop width — not just desktop)
-- [ ] Authentication with RBAC, fully functional and server-enforced
-- [ ] CRUD for Vehicles — all four operations work
-- [ ] CRUD for Drivers — all four operations work
-- [ ] Trip Management with validations (every rule from Section 5 above enforced, not just the happy path)
-- [ ] Automatic status transitions (vehicle/driver/trip — every rule from Section 4)
+- [ DONE ] Authentication with RBAC, fully functional and server-enforced
+- [ DONE ] CRUD for Vehicles — all four operations work
+- [ DONE ] CRUD for Drivers — all four operations work
+- [ DONE ] Trip Management with validations (every rule from Section 5 above enforced, not just the happy path)
+- [ DONE ] Automatic status transitions (vehicle/driver/trip — every rule from Section 4)
 - [ ] Maintenance workflow (open/close, automatic vehicle status sync)
 - [ ] Fuel & Expense tracking (logging + automatic cost computation)
 - [ ] Dashboard with KPIs (all 7 KPIs present, accurate, and filterable)
@@ -158,7 +158,7 @@ Run this as one continuous session; it catches integration bugs that isolated mo
 ---
 
 ## 12. Bonus Features (Spec Section 8) — verify only if time permits, not blocking for submission
-- [ ] Charts and visual analytics (Dashboard vehicle status chart, Analytics revenue/cost charts)
+- [ DONE ] Charts and visual analytics (Dashboard vehicle status chart, Analytics revenue/cost charts)
 - [ ] PDF export
 - [ ] Email reminders for expiring driver licenses
 - [ ] Vehicle document management (upload/view documents per vehicle)

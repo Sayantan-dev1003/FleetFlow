@@ -174,8 +174,19 @@ export function AppProvider({ children }) {
     const id = getVehicleId(regNo);
     if (!id) return { success: false, error: 'Vehicle not found' };
     try {
-      if (updatedFields.status === 'Retired') await updateVehicleMut.mutateAsync({ id, method: 'DELETE' });
-      else await updateVehicleMut.mutateAsync({ id, payload: {}, method: 'PUT' });
+      if (updatedFields.status === 'Retired') {
+        await updateVehicleMut.mutateAsync({ id, method: 'DELETE' });
+      } else {
+        const payload = {
+          name: updatedFields.name,
+          type: updatedFields.type,
+          maxLoadCapacityKg: updatedFields.capacity !== undefined ? Number(updatedFields.capacity) : undefined,
+          acquisitionCost: updatedFields.acqCost !== undefined ? Number(updatedFields.acqCost) : undefined,
+          region: updatedFields.region,
+        };
+        if (updatedFields.status === 'Available') payload.status = 'AVAILABLE';
+        await updateVehicleMut.mutateAsync({ id, payload, method: 'PUT' });
+      }
       return { success: true };
     } catch(e) { return { success: false, error: e.message }; }
   };
@@ -195,7 +206,12 @@ export function AppProvider({ children }) {
     const id = getDriverId(licenseNo);
     if (!id) return { success: false, error: 'Driver not found' };
     try {
-      const payload = {};
+      const payload = {
+        name: updatedFields.name,
+        licenseCategory: updatedFields.category,
+        contactNumber: updatedFields.contact,
+      };
+      if (updatedFields.expiry) payload.licenseExpiryDate = new Date(updatedFields.expiry).toISOString();
       if (updatedFields.status === 'Off Duty') payload.status = 'OFF_DUTY';
       else if (updatedFields.status === 'Available') payload.status = 'AVAILABLE';
       else if (updatedFields.status === 'Suspended') payload.status = 'SUSPENDED';
@@ -217,8 +233,8 @@ export function AppProvider({ children }) {
     const vId = getVehicleId(tripData.vehicleRegNo);
     const dId = getDriverId(tripData.driverLicenseNo);
     try {
-      await createTripMut.mutateAsync({ source: tripData.source, destination: tripData.destination, vehicleId: vId, driverId: dId, cargoWeightKg: Number(tripData.cargoWeight || 0), plannedDistanceKm: Number(tripData.plannedDistance || 0) });
-      return { success: true };
+      const resp = await createTripMut.mutateAsync({ source: tripData.source, destination: tripData.destination, vehicleId: vId, driverId: dId, cargoWeightKg: Number(tripData.cargoWeight || 0), plannedDistanceKm: Number(tripData.plannedDistance || 0) });
+      return { success: true, trip: resp.data };
     } catch(e) { return { success: false, error: e.message }; }
   };
 

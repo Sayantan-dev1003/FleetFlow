@@ -29,6 +29,23 @@ async function createDriver(data) {
     throw ApiError.badRequest('Cannot create a driver with an already-expired license.');
   }
 
+  // Automatically link to an existing driver user account if names match exactly
+  let userIdToLink = data.userId ?? null;
+  
+  if (!userIdToLink) {
+    const unlinkedUser = await prisma.user.findFirst({
+      where: { 
+        name: data.name, 
+        role: { name: 'DRIVER' }, 
+        driver: null 
+      }
+    });
+    
+    if (unlinkedUser) {
+      userIdToLink = unlinkedUser.id;
+    }
+  }
+
   const driver = await prisma.driver.create({
     data: {
       name: data.name,
@@ -37,7 +54,7 @@ async function createDriver(data) {
       licenseExpiryDate: new Date(data.licenseExpiryDate),
       contactNumber: data.contactNumber,
       safetyScore: data.safetyScore ?? 100,
-      userId: data.userId ?? null,
+      userId: userIdToLink,
     },
     select: driverSelect,
   });

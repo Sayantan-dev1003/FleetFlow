@@ -37,6 +37,20 @@ async function register({ name, email, password, roleName }) {
     },
   });
 
+  // Automatically link to an existing driver profile if names match exactly
+  if (role.name === 'DRIVER') {
+    const existingDriver = await prisma.driver.findFirst({
+      where: { name: user.name, userId: null }
+    });
+    
+    if (existingDriver) {
+      await prisma.driver.update({
+        where: { id: existingDriver.id },
+        data: { userId: user.id }
+      });
+    }
+  }
+
   const token = signToken(user.id, user.role.name, user.role.id);
 
   return { user, token };
