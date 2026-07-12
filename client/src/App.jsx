@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import Login from './pages/Login';
@@ -13,59 +14,36 @@ import Settings from './pages/Settings';
 import { AppContext } from './context/AppContext';
 
 export default function App() {
-  const { user, activePage, setActivePage } = useContext(AppContext);
+  const { user } = useContext(AppContext);
   const isAuthenticated = !!user;
   const userRole = user?.role;
 
-  // Explicit Auth Guard matching Mockup validation metrics
   if (!isAuthenticated) {
     return <Login />;
   }
 
-  // Pure clean dynamic conditional engine mappings router
-  const renderView = () => {
-    switch (activePage) {
-      case 'dashboard': 
-        return <Dashboard />;
-      case 'fleet': 
-        return <Fleet />;
-      case 'drivers': 
-        return <Drivers />;
-      case 'trips': 
-        return <TripDispatcher />;
-      case 'maintenance': 
-        return <Maintenance />;
-      case 'expenses': 
-        return <Expenses />;
-      case 'analytics': 
-        return <Analytics />;
-      case 'settings': 
-        return <Settings />;
-      default: 
-        return <Dashboard />;
-    }
-  };
-
   return (
     <div className="flex h-screen w-screen bg-slate-50 overflow-hidden font-sans antialiased text-slate-900 select-none">
-      
-      {/* Sidebar navigation dynamic dashboard element handler matrix */}
-      <Sidebar 
-        activePage={activePage} 
-        setActivePage={setActivePage} 
-        userRole={userRole} 
-      />
+      <Sidebar userRole={userRole} />
 
-      {/* Primary display core injection framework window shell node */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Topbar userSession={user?.name || "User"} />
         
-        {/* Active Route View Viewport container block configuration */}
         <main className="flex-1 overflow-y-auto p-6 max-w-[1600px] w-full mx-auto">
-          {renderView()}
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/fleet" element={<Fleet />} />
+            <Route path="/drivers" element={<Drivers />} />
+            <Route path="/trips" element={<TripDispatcher />} />
+            <Route path="/maintenance" element={<Maintenance />} />
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
         </main>
       </div>
-      
     </div>
   );
 }

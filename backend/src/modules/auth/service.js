@@ -57,9 +57,34 @@ async function login({ email, password }) {
     throw ApiError.unauthorized('Invalid email or password.');
   }
 
+  if (user.lockedUntil && new Date() < user.lockedUntil) {
+    throw ApiError.unauthorized('Account locked due to 5 failed attempts. Please try again later.');
+  }
+
   const passwordMatch = await bcrypt.compare(password, user.passwordHash);
   if (!passwordMatch) {
-    throw ApiError.unauthorized('Invalid email or password.');
+    const attempts = (user.failedLoginAttempts || 0) + 1;
+    if (attempts >= 5) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { failedLoginAttempts: attempts, lockedUntil: new Date(Date.now() + 15 * 60000) }
+      });
+      throw ApiError.unauthorized('Account locked due to 5 failed attempts. Please try again later.');
+    } else {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { failedLoginAttempts: attempts }
+      });
+      throw ApiError.unauthorized('Invalid email or password.');
+    }
+  }
+
+  // Reset counters on successful login
+  if (user.failedLoginAttempts > 0 || user.lockedUntil) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { failedLoginAttempts: 0, lockedUntil: null }
+    });
   }
 
   const token = signToken(user.id, user.role.name, user.role.id);

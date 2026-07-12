@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
+import { NavLink } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 
-export default function Sidebar({ activePage, setActivePage, userRole }) {
+export default function Sidebar({ userRole }) {
   const { logout } = useContext(AppContext);
 
   // Filter sidebar options based on role access rules
@@ -10,9 +11,10 @@ export default function Sidebar({ activePage, setActivePage, userRole }) {
       case 'Fleet Manager':
         return [
           { id: 'fleet', label: 'Fleet Registry' },
-          { id: 'maintenance', label: 'Maintenance Log' }
+          { id: 'maintenance', label: 'Maintenance Log' },
+          { id: 'trips', label: 'Trip Dispatcher' }
         ];
-      case 'Dispatcher':
+      case 'Driver':
         return [
           { id: 'dashboard', label: 'Dashboard' },
           { id: 'trips', label: 'Trip Dispatcher' }
@@ -43,17 +45,19 @@ export default function Sidebar({ activePage, setActivePage, userRole }) {
         </h1>
         <nav className="mt-6 space-y-1">
           {navigationItems.map((item) => (
-            <button
+            <NavLink
               key={item.id}
-              onClick={() => setActivePage(item.id)}
-              className={`w-full flex items-center text-left px-4 py-2.5 text-xs font-bold rounded-lg transition-all uppercase tracking-wider ${
-                activePage === item.id
-                  ? 'bg-amber-500 text-slate-950 shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-200/60'
-              }`}
+              to={`/${item.id}`}
+              className={({ isActive }) =>
+                `w-full flex items-center text-left px-4 py-2.5 text-xs font-bold rounded-lg transition-all uppercase tracking-wider ${
+                  isActive
+                    ? 'bg-amber-500 text-slate-950 shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-200/60'
+                }`
+              }
             >
               {item.label}
-            </button>
+            </NavLink>
           ))}
         </nav>
       </div>
@@ -61,7 +65,7 @@ export default function Sidebar({ activePage, setActivePage, userRole }) {
       <div className="p-4 border-t border-slate-200 bg-slate-50 flex flex-col gap-2.5 text-[11px] text-slate-400 font-medium">
         <div>
           <p className="text-[9px] uppercase tracking-wider text-slate-400">Active Role Scope</p>
-          <p className="text-slate-700 font-black uppercase tracking-wide text-xs">{userRole || 'Dispatcher'}</p>
+          <p className="text-slate-700 font-black uppercase tracking-wide text-xs">{userRole || 'Driver'}</p>
         </div>
         <button 
           onClick={logout}

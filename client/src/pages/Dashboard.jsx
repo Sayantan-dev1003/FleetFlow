@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import StatusBadge from '../components/StatusBadge';
 import { AppContext } from '../context/AppContext';
 
@@ -192,20 +193,38 @@ export default function Dashboard() {
         {/* Vehicle Status Distributions */}
         <div className="lg:col-span-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
           <div>
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-6">Vehicle Status Distribution</h3>
-            <div className="space-y-4 text-xs font-bold text-slate-600">
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Vehicle Status Distribution</h3>
+            <div className="h-48 w-full -ml-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statuses.filter(s => s.pct > 0)}
+                    dataKey="pct"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={70}
+                    stroke="none"
+                  >
+                    {statuses.filter(s => s.pct > 0).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={
+                        entry.name === 'Available' ? '#10b981' :
+                        entry.name === 'On Trip' ? '#3b82f6' :
+                        entry.name === 'In Shop' ? '#f59e0b' : '#f43f5e'
+                      } />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px', fontWeight: 'bold' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-[10px] font-bold text-slate-600 mt-2">
               {statuses.map((s, idx) => (
-                <div key={idx}>
-                  <div className="flex justify-between mb-1.5">
-                    <span className="text-slate-700">{s.name}</span>
-                    <span className="text-slate-950 font-black">{s.pct}%</span>
-                  </div>
-                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/40">
-                    <div 
-                      className={`${s.bg} h-2.5 rounded-full transition-all duration-500`} 
-                      style={{ width: `${s.pct}%` }}
-                    ></div>
-                  </div>
+                <div key={idx} className="flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${s.bg}`}></span>
+                  <span className="truncate">{s.name} ({s.pct}%)</span>
                 </div>
               ))}
             </div>

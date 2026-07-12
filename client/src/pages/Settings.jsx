@@ -40,7 +40,7 @@ export default function Settings() {
             </thead>
             <tbody className="divide-y divide-slate-100 font-semibold text-center">
               <tr><td className="px-3 py-2.5 text-left font-bold text-slate-900">Fleet Manager</td><td>✓</td><td>✓</td><td>—</td><td>—</td><td>✓</td></tr>
-              <tr><td className="px-3 py-2.5 text-left font-bold text-slate-900">Dispatcher</td><td>View</td><td>—</td><td>✓</td><td>—</td><td>—</td></tr>
+              <tr><td className="px-3 py-2.5 text-left font-bold text-slate-900">Driver</td><td>View</td><td>—</td><td>✓</td><td>—</td><td>—</td></tr>
               <tr><td className="px-3 py-2.5 text-left font-bold text-slate-900">Safety Officer</td><td>—</td><td>✓</td><td>View</td><td>—</td><td>—</td></tr>
               <tr><td className="px-3 py-2.5 text-left font-bold text-slate-900">Financial Analyst</td><td>View</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
             </tbody>

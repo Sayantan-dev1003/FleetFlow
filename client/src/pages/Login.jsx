@@ -5,7 +5,7 @@ export default function Login() {
   const { login, accountLocked } = useContext(AppContext);
   const [email, setEmail] = useState('Raven.k@transitops.in');
   const [password, setPassword] = useState('password123');
-  const [role, setRole] = useState('Dispatcher');
+  const [role, setRole] = useState('Driver');
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
@@ -34,7 +34,7 @@ export default function Login() {
 
   const rolesList = [
     { role: 'Fleet Manager', email: 'manager@transitops.in', color: 'border-l-indigo-500 bg-indigo-50/20' },
-    { role: 'Dispatcher', email: 'Raven.k@transitops.in', color: 'border-l-blue-500 bg-blue-50/20' },
+    { role: 'Driver', email: 'Raven.k@transitops.in', color: 'border-l-blue-500 bg-blue-50/20' },
     { role: 'Safety Officer', email: 'safety@transitops.in', color: 'border-l-emerald-500 bg-emerald-50/20' },
     { role: 'Financial Analyst', email: 'analyst@transitops.in', color: 'border-l-amber-500 bg-amber-50/20' }
   ];
@@ -67,7 +67,7 @@ export default function Login() {
             </li>
             <li className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-blue-500 shadow-sm"></span> 
-              <span>Dispatcher ➔ <span className="text-slate-300">Dashboard & Trips</span></span>
+              <span>Driver ➔ <span className="text-slate-300">Dashboard & Trips</span></span>
             </li>
             <li className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-sm"></span> 
@@ -145,7 +145,7 @@ export default function Login() {
                 className="w-full mt-1.5 px-3 py-2 text-xs border border-slate-200 bg-slate-50 rounded-lg outline-none font-semibold text-slate-700 focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-all"
               >
                 <option>Fleet Manager</option>
-                <option>Dispatcher</option>
+                <option>Driver</option>
                 <option>Safety Officer</option>
                 <option>Financial Analyst</option>
               </select>

@@ -27,6 +27,7 @@ const maintenanceRoutes = require('./modules/maintenance/routes');
 const fuelExpenseRoutes = require('./modules/fuel-expenses/routes');
 const dashboardRoutes = require('./modules/dashboard/routes');
 const reportsRoutes = require('./modules/reports/routes');
+const settingsRoutes = require('./modules/settings/routes');
 
 const app = express();
 
@@ -66,6 +67,7 @@ app.use('/api', fuelExpenseRoutes);
 
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // ── 404 Handler ───────────────────────────────────────────────────────────────
 app.use((req, res) => {

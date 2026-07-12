@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { AppContext } from '../context/AppContext';
 
 export default function Analytics() {
@@ -156,28 +157,16 @@ export default function Analytics() {
         <div className="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
           <div>
             <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-6">Monthly Generated Revenue (INR)</h3>
-            
-            <div className="flex items-end justify-between h-56 pt-4 px-4 border-b border-l border-slate-100">
-              {monthlyRevenueData.map((d, i) => {
-                const heightPct = Math.max(Math.round((d.revenue / maxRevenue) * 100), 5); // min 5% for visibility
-                return (
-                  <div key={i} className="flex flex-col items-center group relative w-12">
-                    {/* Hover Tooltip tooltip */}
-                    <span className="absolute -top-8 bg-slate-900 text-white font-bold text-[9px] px-2 py-0.5 rounded shadow opacity-0 group-hover:opacity-100 transition duration-150 z-10">
-                      ₹{d.revenue.toLocaleString()}
-                    </span>
-                    <div 
-                      className="w-10 bg-indigo-600 rounded-t transition-all duration-700 hover:bg-indigo-700 shadow-sm"
-                      style={{ height: `${heightPct}%` }}
-                    ></div>
-                  </div>
-                );
-              })}
-            </div>
-            
-            {/* Chart timeline labels */}
-            <div className="flex justify-between px-4 mt-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              {monthlyRevenueData.map((d, i) => <span key={i} className="w-12 text-center">{d.month}</span>)}
+            <div className="h-64 w-full mt-4 -ml-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyRevenueData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 'bold' }} />
+                  <YAxis axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v/1000}k`} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 'bold' }} />
+                  <RechartsTooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px', fontWeight: 'bold' }} formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']} />
+                  <Bar dataKey="revenue" fill="#4f46e5" radius={[4, 4, 0, 0]} barSize={32} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
           
@@ -196,27 +185,16 @@ export default function Analytics() {
                 No cost metrics registered.
               </div>
             ) : (
-              <div className="space-y-5 text-xs font-bold text-slate-600">
-                {vehicleCostList.slice(0, 5).map((vc, idx) => {
-                  const widthPct = maxVehicleCost > 0 ? Math.round((vc.totalCost / maxVehicleCost) * 100) : 0;
-                  const colors = ['bg-rose-500', 'bg-amber-500', 'bg-blue-500', 'bg-indigo-500', 'bg-slate-500'];
-                  const barColor = colors[idx % colors.length];
-
-                  return (
-                    <div key={idx}>
-                      <div className="flex justify-between mb-1.5 font-bold">
-                        <span className="text-slate-800">{vc.name} ({vc.regNo})</span>
-                        <span className="text-slate-950 font-black">₹{vc.totalCost.toLocaleString()}</span>
-                      </div>
-                      <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200/40">
-                        <div 
-                          className={`${barColor} h-3 rounded-full transition-all duration-700 shadow-sm`} 
-                          style={{ width: `${widthPct}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="h-64 w-full -ml-8 mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={vehicleCostList.slice(0, 5)} layout="vertical" margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                    <XAxis type="number" hide />
+                    <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} />
+                    <RechartsTooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px', fontWeight: 'bold' }} formatter={(value) => [`₹${value.toLocaleString()}`, 'Operational Cost']} />
+                    <Bar dataKey="totalCost" fill="#f43f5e" radius={[0, 4, 4, 0]} barSize={16} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             )}
           </div>

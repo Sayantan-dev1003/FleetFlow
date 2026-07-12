@@ -65,8 +65,10 @@ model User {
   role         Role     @relation(fields: [roleId], references: [id])
   driver       Driver?
   createdTrips Trip[]   @relation("TripCreatedBy")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  failedLoginAttempts Int      @default(0)
+  lockedUntil         DateTime?
 
   @@index([email])
   @@index([roleId])
@@ -195,4 +197,12 @@ model Expense {
   @@index([vehicleId])
   @@index([type])
   @@index([date])
+}
+
+model Settings {
+  id           String   @id @default(uuid())
+  depotName    String   @default("Central Depot")
+  currency     String   @default("INR")
+  distanceUnit String   @default("km")
+  updatedAt    DateTime @updatedAt
 }
