@@ -51,4 +51,6 @@ docker-compose.override.yml
 coverage/
 .nyc_output/
 
-prompt.md
+client_prompt.md
+backend_prompt.md
+snapshots/

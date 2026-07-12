@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Install openssl for Prisma
+RUN apk add --no-cache openssl
+
 # Install dependencies first (layer caching)
 COPY package*.json ./
 RUN npm ci --omit=dev
@@ -20,7 +23,7 @@ FROM node:20-alpine AS production
 WORKDIR /app
 
 # Install only what's needed for production
-RUN apk add --no-cache dumb-init
+RUN apk add --no-cache dumb-init openssl
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S fleetflow -u 1001
