@@ -8,8 +8,8 @@ export default function Login({ onBack }) {
   const [activeTab, setActiveTab] = useState('login');
   
   // Login Form States
-  const [loginEmail, setLoginEmail] = useState('Raven.k@transitops.in');
-  const [loginPassword, setLoginPassword] = useState('password123');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [loginRole, setLoginRole] = useState('Dispatcher');
   const [loginError, setLoginError] = useState('');
 
@@ -91,13 +91,7 @@ export default function Login({ onBack }) {
     }, 50);
   };
 
-  const demoRolesList = [
-    { role: 'Fleet Manager', email: 'manager@transitops.in', color: 'border-l-indigo-500 bg-indigo-50/40' },
-    { role: 'Dispatcher', email: 'Raven.k@transitops.in', color: 'border-l-blue-500 bg-blue-50/40' },
-    { role: 'Safety Officer', email: 'safety@transitops.in', color: 'border-l-emerald-500 bg-emerald-50/40' },
-    { role: 'Financial Analyst', email: 'analyst@transitops.in', color: 'border-l-amber-500 bg-amber-50/40' }
-  ];
-
+ 
   return (
     <div className="flex h-screen w-screen bg-slate-50 font-sans overflow-hidden select-none animate-fadeIn">
       
@@ -239,7 +233,7 @@ export default function Login({ onBack }) {
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">
                   Console Landing Role (RBAC Scope)
                 </label>
@@ -254,7 +248,7 @@ export default function Login({ onBack }) {
                   <option>Safety Officer</option>
                   <option>Financial Analyst</option>
                 </select>
-              </div>
+              </div> */}
 
               <div className="flex justify-between items-center text-xs font-bold mt-2">
                 <label className="flex items-center gap-2 text-slate-500 cursor-pointer">
@@ -299,7 +293,7 @@ export default function Login({ onBack }) {
 
                 <div>
                   <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">
-                    Select Database Role
+                    Select Role
                   </label>
                   <select 
                     value={registerRole} 
@@ -375,27 +369,6 @@ export default function Login({ onBack }) {
             </form>
           )}
 
-          {/* Quick Helper Panel */}
-          {activeTab === 'login' && (
-            <div className="mt-6 pt-5 border-t border-slate-100">
-              <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-3">
-                ⚡ Sandbox Credentials (Click to log in instantly)
-              </p>
-              <div className="grid grid-cols-2 gap-2.5">
-                {demoRolesList.map((x, idx) => (
-                  <div 
-                    key={idx}
-                    onClick={() => !accountLocked && handleQuickLogin(x.role, x.email)}
-                    className={`border border-slate-200/60 p-2.5 rounded-lg cursor-pointer hover:border-slate-400 hover:shadow-sm transition-all text-left ${x.color} ${accountLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    <p className="text-[10px] font-black text-slate-800 uppercase tracking-wide">{x.role}</p>
-                    <p className="text-[9px] font-semibold text-slate-400 truncate mt-0.5">{x.email}</p>
-                    <p className="text-[8px] text-slate-400 mt-1 font-bold">BYPASS KEY: password123</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

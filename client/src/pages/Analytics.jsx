@@ -38,15 +38,13 @@ export default function Analytics() {
     : "0.0";
 
   const metrics = [
-    { label: "Fuel Efficiency", val: `${fuelEfficiency} km/l`, col: "border-blue-500", desc: "Completed distance / Fuel liters" },
-    { label: "Fleet Utilization", val: `${fleetUtilization}%`, col: "border-emerald-500", desc: "On-trip active vehicles ratio" },
-    { label: "Operational Cost", val: `₹${totalOperationalCost.toLocaleString()}`, col: "border-amber-500", desc: "Fuel + Maint + Tolls + Misc" },
-    { label: "Vehicle ROI", val: `${vehicleRoi}%`, col: "border-green-500", desc: "(Revenue - Ops Cost) / Acq Cost" },
+    { label: "Fuel Efficiency", val: `${fuelEfficiency} km/l`, col: "border-blue-500 bg-gradient-to-br from-blue-50/50 to-white text-blue-900", desc: "Completed distance / Fuel liters" },
+    { label: "Fleet Utilization", val: `${fleetUtilization}%`, col: "border-emerald-500 bg-gradient-to-br from-emerald-50/50 to-white text-emerald-900", desc: "On-trip active vehicles ratio" },
+    { label: "Operational Cost", val: `₹${totalOperationalCost.toLocaleString()}`, col: "border-amber-500 bg-gradient-to-br from-amber-50/50 to-white text-amber-900", desc: "Fuel + Maint + Tolls + Misc" },
+    { label: "Vehicle ROI", val: `${vehicleRoi}%`, col: "border-teal-500 bg-gradient-to-br from-teal-50/50 to-white text-teal-900", desc: "(Revenue - Ops Cost) / Acq Cost" },
   ];
 
   // Dynamic Chart 1: Monthly Revenue
-  // We can group trip revenues by month. 
-  // Let's assume some historical values for Jan-Jun, and calculate July from real-time trips.
   const julyTripRevenue = trips
     .filter(t => t.status === 'Completed' || t.status === 'Dispatched')
     .reduce((acc, curr) => acc + Number(curr.revenue || 0), 0);
@@ -61,10 +59,7 @@ export default function Analytics() {
     { month: 'Jul', revenue: julyTripRevenue }
   ];
 
-  const maxRevenue = Math.max(...monthlyRevenueData.map(d => d.revenue), 1);
-
   // Dynamic Chart 2: Costliest Vehicles horizontal bar chart
-  // Group costs by vehicle regNo
   const vehicleCostList = vehicles.map(v => {
     const vFuel = fuelLogs.filter(f => f.vehicleRegNo === v.regNo).reduce((acc, c) => acc + Number(c.cost || 0), 0);
     const vMaint = maintenanceLogs.filter(m => m.vehicleRegNo === v.regNo).reduce((acc, c) => acc + Number(c.cost || 0), 0);
@@ -75,8 +70,6 @@ export default function Analytics() {
       totalCost: vFuel + vMaint + vExp
     };
   }).sort((a, b) => b.totalCost - a.totalCost);
-
-  const maxVehicleCost = vehicleCostList.length > 0 ? vehicleCostList[0].totalCost : 1;
 
   // Export CSV function
   const handleExportCSV = () => {
@@ -119,16 +112,16 @@ export default function Analytics() {
   };
 
   return (
-    <div className="space-y-6 text-left">
+    <div className="space-y-6 text-left animate-fadeIn">
       {/* Top Header Block with CSV Export Button */}
-      <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+      <div className="flex justify-between items-center border-b border-slate-200/80 pb-4 flex-wrap gap-4">
         <div>
           <h2 className="text-base font-black text-slate-800 uppercase tracking-wider">Reports & Analytics Dashboard</h2>
           <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Real-time dynamic fleet performance metrics</p>
         </div>
         <button 
           onClick={handleExportCSV}
-          className="bg-amber-500 hover:bg-amber-600 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-wide transition shadow-sm cursor-pointer"
+          className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-slate-950 px-5 py-2.5 rounded-lg font-black text-xs uppercase tracking-wider transition shadow hover:scale-102 cursor-pointer"
         >
           🗎 Export Fleet Report (CSV)
         </button>
@@ -137,16 +130,16 @@ export default function Analytics() {
       {/* 4 Upper Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((m, idx) => (
-          <div key={idx} className={`bg-white p-5 rounded-xl border-l-4 border border-slate-200 shadow-sm ${m.col} hover:shadow-md transition-all`}>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{m.label}</p>
+          <div key={idx} className={`p-5 rounded-xl border-l-4 border border-slate-200/60 shadow-sm ${m.col} hover:scale-[1.03] hover:shadow-md transition-all duration-300`}>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider truncate">{m.label}</p>
             <p className="text-2xl font-black text-slate-900 mt-1">{m.val}</p>
-            <p className="text-[9px] text-slate-400 mt-2 font-medium">{m.desc}</p>
+            <p className="text-[9px] text-slate-400 mt-2 font-semibold">{m.desc}</p>
           </div>
         ))}
       </div>
       
       {/* Formula Footnote from Mockup */}
-      <p className="text-[10px] text-slate-400 font-semibold italic -mt-4 pl-1">
+      <p className="text-[10px] text-slate-400 font-bold italic -mt-4 pl-1">
         Formula ROI Calculation Model: ROI = (Revenue - (Maintenance + Fuel + Operational Expenses)) / Acquisition Cost
       </p>
 
@@ -154,7 +147,7 @@ export default function Analytics() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-4">
         
         {/* Left Column: Simulated Monthly Revenue Bar Chart */}
-        <div className="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
           <div>
             <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-6">Monthly Generated Revenue (INR)</h3>
             <div className="h-64 w-full mt-4 -ml-4">
@@ -164,24 +157,24 @@ export default function Analytics() {
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 'bold' }} />
                   <YAxis axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v/1000}k`} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 'bold' }} />
                   <RechartsTooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px', fontWeight: 'bold' }} formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']} />
-                  <Bar dataKey="revenue" fill="#4f46e5" radius={[4, 4, 0, 0]} barSize={32} />
+                  <Bar dataKey="revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={32} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
           
-          <div className="text-[9px] text-slate-400 font-medium italic mt-4 text-center">
+          <div className="text-[9px] text-slate-400 font-bold italic mt-4 text-center">
             * July revenue aggregates active and completed trips dynamically.
           </div>
         </div>
 
         {/* Right Column: Top Costliest Vehicles Horizontal Bars */}
-        <div className="lg:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
           <div>
             <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-6">Top Costliest Operational Vehicles</h3>
             
             {vehicleCostList.length === 0 ? (
-              <div className="py-12 text-center text-slate-400 font-semibold text-xs border border-dashed border-slate-100 rounded-lg">
+              <div className="py-12 text-center text-slate-400 font-bold text-xs border border-dashed border-slate-100 rounded-lg">
                 No cost metrics registered.
               </div>
             ) : (
@@ -199,7 +192,7 @@ export default function Analytics() {
             )}
           </div>
 
-          <div className="text-[9px] text-slate-400 font-medium italic mt-6 border-t border-slate-100 pt-3 text-center">
+          <div className="text-[9px] text-slate-400 font-bold italic mt-6 border-t border-slate-100 pt-3 text-center">
             Expenses represent combined fuel receipts, tolls, and maintenance logs.
           </div>
         </div>

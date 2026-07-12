@@ -18,10 +18,10 @@ export default function StatusBadge({ status }) {
   };
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 text-[11px] font-bold tracking-wide rounded-md border shadow-sm ${styles[status] || "bg-slate-50 text-slate-700 border-slate-200"}`}>
-      <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${
+    <span className={`inline-flex items-center px-2.5 py-1 text-[10px] font-bold tracking-wide rounded-md border shadow-xs ${styles[status] || "bg-slate-50 text-slate-700 border-slate-200"}`}>
+      <span className={`h-1.5 w-1.5 rounded-full mr-1.5 animate-pulse ${
         status === 'Available' || status === 'Completed' ? 'bg-emerald-500' :
-        status === 'On Trip' || status === 'Dispatched' ? 'bg-indigo-500' :
+        status === 'On Trip' || status === 'Dispatched' ? 'bg-sky-500' :
         status === 'In Shop' ? 'bg-amber-500' : 'bg-rose-500'
       }`}></span>
       {status}

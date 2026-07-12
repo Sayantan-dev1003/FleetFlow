@@ -103,163 +103,212 @@ export default function Drivers() {
     return matchesSearch && matchesStatus;
   });
 
+  // Helper function to extract initials for driver avatar
+  const getInitials = (n) => {
+    const parts = n.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return n.slice(0, 2).toUpperCase();
+  };
+
+  // Helper function to choose random avatar background colors based on name hashes
+  const getAvatarBg = (n) => {
+    const code = n.charCodeAt(0) % 4;
+    if (code === 0) return 'bg-indigo-500 text-indigo-50';
+    if (code === 1) return 'bg-purple-500 text-purple-50';
+    if (code === 2) return 'bg-emerald-500 text-emerald-50';
+    return 'bg-amber-500 text-amber-950';
+  };
+
   return (
-    <div className="bg-white p-6 rounded-xl border border-slate-200 space-y-6 shadow-sm">
-      {/* Top Flex Logs Header Block */}
-      <div className="flex justify-between items-center border-b border-slate-100 pb-4 flex-wrap gap-4">
-        <div className="flex items-center gap-4 flex-wrap">
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">Driver Management</h3>
-          <input 
-            type="text" 
-            placeholder="Search driver or license..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border border-slate-200 rounded-lg px-3 py-1.5 outline-none font-normal text-xs normal-case w-56 focus:ring-1 focus:ring-amber-500 bg-slate-50" 
-          />
+    <div className="space-y-6 animate-fadeIn">
+      {/* Top Controller Ribbon */}
+      <div className="bg-white p-5 rounded-xl border border-slate-200/80 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+        <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-500 uppercase tracking-wider">
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] text-slate-400">Search Driver Roster</label>
+            <input 
+              type="text" 
+              placeholder="Search name or license number..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="border border-slate-200 rounded-lg px-3 py-1.5 outline-none font-normal text-xs normal-case w-64 focus:ring-1 focus:ring-amber-500 bg-slate-50 shadow-xs" 
+            />
+          </div>
+          
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] text-slate-400">Roster Filters</label>
+            <div className="flex gap-2">
+              {['Available', 'On Trip', 'Off Duty', 'Suspended'].map((statusOption) => (
+                <span 
+                  key={statusOption}
+                  onClick={() => handleFilterToggle(statusOption)}
+                  className={`px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-all cursor-pointer select-none ${
+                    selectedStatusFilter === statusOption 
+                      ? 'bg-slate-900 text-white border-slate-950 scale-102 shadow-xs' 
+                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'
+                  }`}
+                >
+                  {statusOption}
+                </span>
+              ))}
+              {selectedStatusFilter !== 'All' && (
+                <span 
+                  onClick={() => setSelectedStatusFilter('All')}
+                  className="px-2 py-1.5 text-[10px] font-bold text-rose-600 hover:text-rose-800 transition cursor-pointer self-center"
+                >
+                  Reset
+                </span>
+              )}
+            </div>
+          </div>
         </div>
+
         <button 
           onClick={handleOpenAdd}
-          className="bg-amber-500 hover:bg-amber-600 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-wide transition shadow-sm cursor-pointer"
+          className="self-end bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-slate-950 px-5 py-2.5 rounded-lg font-black text-xs uppercase tracking-wider transition shadow hover:scale-102 cursor-pointer"
         >
           + Add Driver
         </button>
       </div>
 
-      {/* Main Roster List */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-xs text-left text-slate-600">
-          <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-100">
-            <tr>
-              <th className="px-4 py-3">Driver Name</th>
-              <th className="px-4 py-3">License No</th>
-              <th className="px-4 py-3">Category</th>
-              <th className="px-4 py-3">Expiry Date</th>
-              <th className="px-4 py-3">Contact</th>
-              <th className="px-4 py-3">Trips Compl.</th>
-              <th className="px-4 py-3">Safety Score</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
-            {filteredDrivers.length === 0 ? (
-              <tr>
-                <td colSpan="9" className="text-center py-10 text-slate-400 font-medium border-2 border-dashed border-slate-100 rounded-lg">
-                  No drivers found.
-                </td>
-              </tr>
-            ) : (
-              filteredDrivers.map((d, idx) => {
-                const isExpired = d.expiry < todayStr;
-                return (
-                  <tr key={idx} className={`hover:bg-slate-50/50 transition-colors ${isExpired ? 'bg-rose-50/40 text-rose-950' : ''}`}>
-                    <td className="px-4 py-3.5 font-bold text-slate-950">{d.name}</td>
-                    <td className="px-4 py-3.5 tracking-wider">{d.licenseNo}</td>
-                    <td className="px-4 py-3.5">{d.category}</td>
-                    <td className={`px-4 py-3.5 ${isExpired ? 'text-rose-600 font-black animate-pulse' : ''}`}>
-                      {d.expiry} {isExpired && ' (EXPIRED)'}
-                    </td>
-                    <td className="px-4 py-3.5 text-slate-500 font-normal">{d.contact}</td>
-                    <td className="px-4 py-3.5">{d.tripsCompleted}</td>
-                    <td className="px-4 py-3.5">
-                      <span className={`px-1.5 py-0.5 rounded font-black ${d.safetyScore >= 90 ? 'text-emerald-700 bg-emerald-50' : d.safetyScore >= 80 ? 'text-amber-700 bg-amber-50' : 'text-rose-700 bg-rose-50'}`}>
-                        {d.safetyScore}%
-                      </span>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <StatusBadge status={d.status}/>
-                    </td>
-                    <td className="px-4 py-3.5 text-right space-x-2">
-                      <button 
-                        onClick={() => handleOpenEdit(d)}
-                        className="px-2.5 py-1 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition shadow-sm cursor-pointer"
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(d.licenseNo)}
-                        className="px-2.5 py-1 text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded hover:bg-rose-100 transition shadow-sm cursor-pointer"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Helper Toggle Switch Grid Mock */}
-      <div className="flex flex-col gap-3 border-t border-slate-100 pt-4">
-        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-          Quick Filters (Click to Toggle Status Filters)
-        </span>
-        <div className="flex flex-wrap gap-2.5">
-          <span 
-            onClick={() => handleFilterToggle('Available')}
-            className={`px-3 py-1 text-xs font-bold rounded shadow-sm border transition-all cursor-pointer ${
-              selectedStatusFilter === 'Available' 
-                ? 'bg-emerald-600 text-white border-emerald-700 scale-105' 
-                : 'bg-white hover:bg-slate-50 border-slate-200 text-emerald-700'
-            }`}
-          >
-            Available
-          </span>
-          <span 
-            onClick={() => handleFilterToggle('On Trip')}
-            className={`px-3 py-1 text-xs font-bold rounded shadow-sm border transition-all cursor-pointer ${
-              selectedStatusFilter === 'On Trip' 
-                ? 'bg-blue-600 text-white border-blue-700 scale-105' 
-                : 'bg-white hover:bg-slate-50 border-slate-200 text-blue-700'
-            }`}
-          >
-            On Trip
-          </span>
-          <span 
-            onClick={() => handleFilterToggle('Off Duty')}
-            className={`px-3 py-1 text-xs font-bold rounded shadow-sm border transition-all cursor-pointer ${
-              selectedStatusFilter === 'Off Duty' 
-                ? 'bg-slate-600 text-white border-slate-700 scale-105' 
-                : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
-            }`}
-          >
-            Off Duty
-          </span>
-          <span 
-            onClick={() => handleFilterToggle('Suspended')}
-            className={`px-3 py-1 text-xs font-bold rounded shadow-sm border transition-all cursor-pointer ${
-              selectedStatusFilter === 'Suspended' 
-                ? 'bg-rose-600 text-white border-rose-700 scale-105' 
-                : 'bg-white hover:bg-slate-50 border-slate-200 text-rose-700'
-            }`}
-          >
-            Suspended
-          </span>
-          {selectedStatusFilter !== 'All' && (
-            <span 
-              onClick={() => setSelectedStatusFilter('All')}
-              className="px-3 py-1 text-xs font-bold rounded bg-slate-100 hover:bg-slate-200 text-slate-500 border border-slate-200 cursor-pointer transition-all"
-            >
-              Clear Filter [x]
-            </span>
-          )}
+      {/* Roster Cards Grid */}
+      {filteredDrivers.length === 0 ? (
+        <div className="bg-white py-16 text-center text-slate-400 font-bold text-sm border-2 border-dashed border-slate-200 rounded-xl shadow-xs animate-pulse">
+          No driver profiles found matching search constraints.
         </div>
-        <p className="text-[11px] text-rose-700 font-semibold bg-rose-50 border border-rose-100 p-2.5 rounded-lg">
-          Rule: Expired license or Suspended status ➔ blocked from trip assignment. A driver already marked "On Trip" cannot be assigned to another trip.
-        </p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredDrivers.map((d, idx) => {
+            const isExpired = d.expiry < todayStr;
+            const daysLeft = Math.ceil((new Date(d.expiry) - new Date()) / (24*60*60*1000));
+            const isClosingExpiry = !isExpired && daysLeft <= 30;
+
+            return (
+              <div 
+                key={idx} 
+                className={`bg-white p-5 rounded-xl border transition-all duration-300 flex flex-col justify-between relative shadow-sm hover:shadow-md hover:scale-[1.01] group ${
+                  isExpired ? 'border-rose-300 bg-rose-50/20' : 'border-slate-200/80'
+                }`}
+              >
+                {/* Accent bar indicating license validation statuses */}
+                <div className={`absolute top-0 left-0 w-2.5 h-full opacity-0 group-hover:opacity-100 transition-opacity ${
+                  isExpired ? 'bg-rose-500' : isClosingExpiry ? 'bg-amber-500' : 'bg-gradient-to-b from-amber-400 to-orange-500'
+                }`}></div>
+
+                <div>
+                  {/* Top Avatar Row */}
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="flex items-center gap-3">
+                      {/* Round Avatar Widget with initials */}
+                      <div className={`h-11 w-11 rounded-full flex items-center justify-center font-black text-xs shadow-inner uppercase tracking-wider relative shrink-0 ${getAvatarBg(d.name)}`}>
+                        {getInitials(d.name)}
+                        {/* Status Indicator Dot positioned on bottom-right of avatar */}
+                        <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white animate-pulse ${
+                          d.status === 'Available' ? 'bg-emerald-500' :
+                          d.status === 'On Trip' ? 'bg-sky-500' :
+                          d.status === 'Off Duty' ? 'bg-slate-400' : 'bg-rose-500'
+                        }`}></span>
+                      </div>
+                      <div>
+                        <h4 className="font-black text-slate-900 text-sm truncate max-w-[150px]">{d.name}</h4>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Category: {d.category}</p>
+                      </div>
+                    </div>
+                    <StatusBadge status={d.status} />
+                  </div>
+
+                  {/* License Info and Contact details */}
+                  <div className="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-slate-100/60 text-[10px] font-bold text-slate-500">
+                    <div>
+                      <span className="text-slate-400 block uppercase text-[9px] tracking-wider">License Key</span>
+                      <span className="text-slate-700 tracking-wider">{d.licenseNo}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block uppercase text-[9px] tracking-wider">Contact Number</span>
+                      <span className="text-slate-700">{d.contact || 'None'}</span>
+                    </div>
+                  </div>
+
+                  {/* Expiry Auditing Warning Ribbon */}
+                  <div className="mt-4">
+                    <span className="text-slate-400 block uppercase text-[9px] tracking-wider font-bold">License Expiry</span>
+                    {isExpired ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-100 text-rose-700 font-black text-[9px] uppercase tracking-wide border border-rose-200 mt-1 animate-pulse">
+                        ⚠️ EXPIRED LICENSES (BLOCKED DISPATCH)
+                      </span>
+                    ) : isClosingExpiry ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-100 text-amber-700 font-black text-[9px] uppercase tracking-wide border border-amber-200 mt-1">
+                        ⚠️ Expiry within {daysLeft} days
+                      </span>
+                    ) : (
+                      <span className="text-xs font-black text-slate-700 mt-0.5 block">{d.expiry}</span>
+                    )}
+                  </div>
+
+                  {/* Safety score details and trips logged metrics */}
+                  <div className="mt-4 pt-4 border-t border-slate-100/60 grid grid-cols-2 gap-4 items-center">
+                    <div>
+                      <span className="text-slate-400 block uppercase text-[9px] tracking-wider font-bold">Safety Index</span>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded ${
+                          d.safetyScore >= 90 ? 'text-emerald-700 bg-emerald-50' : 
+                          d.safetyScore >= 80 ? 'text-amber-700 bg-amber-50' : 'text-rose-700 bg-rose-50'
+                        }`}>
+                          {d.safetyScore}%
+                        </span>
+                        {/* Mini progress bar */}
+                        <div className="flex-1 bg-slate-100 rounded-full h-1 overflow-hidden">
+                          <div className={`h-full rounded-full ${
+                            d.safetyScore >= 90 ? 'bg-emerald-500' : 
+                            d.safetyScore >= 80 ? 'bg-amber-500' : 'bg-rose-500'
+                          }`} style={{ width: `${d.safetyScore}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-right">
+                      <span className="text-slate-400 block uppercase text-[9px] tracking-wider font-bold">Total Dispatches</span>
+                      <span className="text-xs font-black text-slate-700 mt-1 block">{d.tripsCompleted} completed</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Controls */}
+                <div className="flex justify-end gap-2.5 mt-5 pt-3 border-t border-slate-100/60">
+                  <button 
+                    onClick={() => handleOpenEdit(d)}
+                    className="px-3 py-1.5 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition shadow-xs cursor-pointer"
+                  >
+                    Edit Profile
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(d.licenseNo)}
+                    className="px-3 py-1.5 text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-lg hover:bg-rose-100 transition shadow-xs cursor-pointer"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Helper Warning */}
+      <div className="text-[11px] font-semibold text-rose-700 bg-rose-50 border border-rose-100 p-3 rounded-lg flex items-center gap-2">
+        <span>⚠️</span>
+        <span>Driver license compliance validation is active. Drivers with expired licenses are dynamically flagged in red and blocked from new trip dispatches.</span>
       </div>
 
-      {/* Add / Edit Driver Modal */}
+      {/* Create / Edit Modal Popup */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 animate-fadeIn">
-          <div className="bg-white p-6 rounded-xl border border-slate-200 w-full max-w-md shadow-2xl text-left">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-fadeIn p-4">
+          <div className="bg-white p-6 rounded-xl border border-slate-200 w-full max-w-md shadow-2xl relative">
             <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
               {isEditMode ? 'Edit Driver Profile' : 'Register New Driver'}
             </h3>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
+            
+            <form onSubmit={handleSubmit} className="space-y-4 text-left">
               {formError && (
                 <div className="p-2.5 bg-rose-50 text-rose-700 text-[10px] font-bold border border-rose-200 rounded-lg">
                   ⚠️ {formError}
@@ -268,102 +317,97 @@ export default function Drivers() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase">Driver Name</label>
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Driver Name</label>
                   <input 
                     type="text" 
-                    placeholder="Alex"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full mt-1.5 px-3 py-1.5 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500"
+                    placeholder="Rajesh Kumar"
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    className="w-full mt-1.5 px-3 py-2 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500" 
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase">License Number</label>
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">License Number</label>
                   <input 
                     type="text" 
-                    placeholder="DL-88213"
-                    value={licenseNo}
-                    onChange={(e) => setLicenseNo(e.target.value)}
+                    placeholder="MH-01-2024-0012"
+                    value={licenseNo} 
+                    onChange={(e) => setLicenseNo(e.target.value)} 
                     disabled={isEditMode}
-                    className={`w-full mt-1.5 px-3 py-1.5 text-xs border rounded-lg outline-none font-semibold ${isEditMode ? 'bg-slate-100 text-slate-500 border-slate-200' : 'bg-slate-50 border-slate-200 focus:ring-1 focus:ring-amber-500'}`}
+                    className={`w-full mt-1.5 px-3 py-2 text-xs border rounded-lg outline-none font-semibold ${isEditMode ? 'bg-slate-100 text-slate-500 border-slate-200' : 'bg-slate-50 border-slate-200 focus:ring-1 focus:ring-amber-500'}`}
                   />
                   {isDuplicateLicense && (
-                    <span className="text-[9px] text-rose-600 font-bold block mt-1">❌ Already exists!</span>
+                    <span className="text-[9px] text-rose-600 font-bold block mt-1">❌ License number exists!</span>
                   )}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase">Category</label>
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">License Category</label>
                   <select 
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full mt-1.5 px-3 py-1.5 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500"
+                    value={category} 
+                    onChange={(e) => setCategory(e.target.value)} 
+                    className="w-full mt-1.5 px-3 py-2 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500 cursor-pointer"
                   >
-                    <option value="LMV">LMV (Light Vehicle)</option>
-                    <option value="HMV">HMV (Heavy Vehicle)</option>
-                    <option value="Two Wheeler">Two Wheeler</option>
+                    <option value="LMV">LMV (Light Motor)</option>
+                    <option value="HMV">HMV (Heavy Motor)</option>
+                    <option value="TRANS">TRANS (Transport Heavy)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase">Expiry Date</label>
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">License Expiry Date</label>
                   <input 
                     type="date" 
-                    value={expiry}
-                    onChange={(e) => setExpiry(e.target.value)}
-                    className="w-full mt-1.5 px-3 py-1.5 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500"
+                    value={expiry} 
+                    onChange={(e) => setExpiry(e.target.value)} 
+                    className="w-full mt-1.5 px-3 py-2 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500 cursor-pointer" 
                   />
-                  {expiry && expiry < todayStr && (
-                    <span className="text-[9px] text-rose-600 font-bold block mt-1">⚠️ This license is expired!</span>
-                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase">Contact Number</label>
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Contact Number</label>
                   <input 
                     type="text" 
-                    placeholder="98765xxxxx"
-                    value={contact}
-                    onChange={(e) => setContact(e.target.value)}
-                    className="w-full mt-1.5 px-3 py-1.5 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500"
+                    placeholder="9876543210"
+                    value={contact} 
+                    onChange={(e) => setContact(e.target.value)} 
+                    className="w-full mt-1.5 px-3 py-2 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500" 
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase">Safety Score (%)</label>
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Safety Index Score (%)</label>
                   <input 
                     type="number" 
-                    value={safetyScore}
-                    onChange={(e) => setSafetyScore(Number(e.target.value))}
-                    max="100"
-                    min="0"
-                    className="w-full mt-1.5 px-3 py-1.5 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500"
+                    value={safetyScore} 
+                    onChange={(e) => setSafetyScore(Number(e.target.value))} 
+                    className="w-full mt-1.5 px-3 py-2 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500" 
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase">Trips Completed</label>
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Trips Completed</label>
                   <input 
                     type="number" 
-                    value={tripsCompleted}
-                    onChange={(e) => setTripsCompleted(Number(e.target.value))}
-                    className="w-full mt-1.5 px-3 py-1.5 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500"
+                    value={tripsCompleted} 
+                    onChange={(e) => setTripsCompleted(Number(e.target.value))} 
+                    className="w-full mt-1.5 px-3 py-2 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500" 
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 uppercase">Status</label>
+                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Current Status</label>
                   <select 
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    className="w-full mt-1.5 px-3 py-1.5 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500"
+                    value={status} 
+                    onChange={(e) => setStatus(e.target.value)} 
+                    className="w-full mt-1.5 px-3 py-2 text-xs border bg-slate-50 border-slate-200 rounded-lg outline-none font-semibold focus:ring-1 focus:ring-amber-500 cursor-pointer"
                   >
                     <option value="Available">Available</option>
                     <option value="On Trip">On Trip</option>
