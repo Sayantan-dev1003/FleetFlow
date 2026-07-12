@@ -28,11 +28,7 @@ export default function Topbar() {
     <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 w-full shrink-0 shadow-sm">
       {/* Target Global Context Field Mockup */}
       <div className="w-72">
-        <input 
-          type="text" 
-          placeholder="Search..." 
-          className="w-full px-4 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-1 focus:ring-amber-500 font-semibold" 
-        />
+       
       </div>
 
       {/* User Status Profile Metadata Selector */}
