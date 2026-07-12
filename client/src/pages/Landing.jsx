@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import landingBanner from '../assets/landing_banner.png';
 import { 
   FiTruck, FiShield, FiMap, FiTrendingUp, 
@@ -8,8 +9,9 @@ import { FaReact } from 'react-icons/fa';
 import { SiVite, SiTailwindcss, SiPrisma } from 'react-icons/si';
 import { MdOutlineDashboardCustomize } from 'react-icons/md';
 
-export default function Landing({ onLaunch }) {
+export default function Landing() {
   const [activeRoleTab, setActiveRoleTab] = useState('Dispatcher');
+  const navigate = useNavigate();
 
   const roleInfo = {
     'Fleet Manager': {
@@ -106,13 +108,13 @@ export default function Landing({ onLaunch }) {
           <a href="#tech" className="hover:text-amber-500 transition-colors">Console Stack</a>
         </nav>
 
-        <button 
-          onClick={onLaunch}
+        <Link 
+          to="/login"
           className="group flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 px-5 py-2.5 rounded-lg font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-lg shadow-amber-500/20 cursor-pointer"
         >
           <span>Launch Console</span>
           <FiArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
-        </button>
+        </Link>
       </header>
 
       {/* Hero Section */}
@@ -144,13 +146,13 @@ export default function Landing({ onLaunch }) {
           </p>
 
           <div className="flex flex-wrap gap-4 pt-4">
-            <button 
-              onClick={onLaunch}
+            <Link 
+              to="/login"
               className="group flex items-center gap-3 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black px-8 py-4 rounded-xl text-xs uppercase tracking-widest transition-all hover:-translate-y-1 shadow-xl shadow-orange-500/20 cursor-pointer"
             >
               Sign In to Console
               <FiArrowRight className="text-lg group-hover:translate-x-1 transition-transform" />
-            </button>
+            </Link>
             <a 
               href="#features"
               className="flex items-center justify-center px-8 py-4 border border-slate-700 bg-slate-900/50 hover:bg-slate-800 hover:border-slate-600 text-slate-300 hover:text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all backdrop-blur-sm"

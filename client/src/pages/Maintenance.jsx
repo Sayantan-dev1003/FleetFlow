@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { toast } from 'react-hot-toast';
 import StatusBadge from '../components/StatusBadge';
 import { AppContext } from '../context/AppContext';
 
@@ -15,7 +16,6 @@ export default function Maintenance() {
   const [serviceType, setServiceType] = useState('Oil Change');
   const [cost, setCost] = useState(2500);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [formError, setFormError] = useState('');
 
   // Dropdown list: only show active vehicles that are not Retired
   const activeVehicles = vehicles.filter(v => v.status !== 'Retired');
@@ -29,10 +29,9 @@ export default function Maintenance() {
 
   const handleSave = (e) => {
     e.preventDefault();
-    setFormError('');
 
     if (!selectedVehicleReg) {
-      setFormError('Please select a valid active vehicle.');
+      toast.error('Please select a valid active vehicle.');
       return;
     }
 
@@ -48,18 +47,18 @@ export default function Maintenance() {
       setServiceType('Oil Change');
       setCost(2500);
       setDate(new Date().toISOString().split('T')[0]);
-      alert(`Service log added! Vehicle status changed to 'In Shop'.`);
+      toast.success(`Service log added! Vehicle status changed to 'In Shop'.`);
     } else {
-      setFormError(res.error);
+      toast.error(res.error || 'Failed to add service log');
     }
   };
 
   const handleCompleteService = (logId) => {
     const res = completeMaintenanceLog(logId);
     if (!res.success) {
-      alert(`Error completing service: ${res.error}`);
+      toast.error(`Error completing service: ${res.error}`);
     } else {
-      alert('Maintenance completed! Vehicle has been restored to Available status.');
+      toast.success('Maintenance completed! Vehicle has been restored to Available status.');
     }
   };
 
@@ -73,11 +72,6 @@ export default function Maintenance() {
         </h3>
         
         <form onSubmit={handleSave} className="space-y-4">
-          {formError && (
-            <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold rounded-lg animate-pulse">
-              ⚠️ {formError}
-            </div>
-          )}
 
           <div>
             <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Select Vehicle</label>

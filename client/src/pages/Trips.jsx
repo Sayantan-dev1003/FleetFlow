@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import StatusBadge from '../components/StatusBadge';
 import { AppContext } from '../context/AppContext';
 
@@ -24,8 +25,6 @@ export default function Trips() {
   const [cargoWeight, setCargoWeight] = useState(450);
   const [plannedDistance, setPlannedDistance] = useState(38);
   const [revenue, setRevenue] = useState(15000);
-  const [formError, setFormError] = useState('');
-  const [formSuccess, setFormSuccess] = useState('');
 
   // Complete Trip modal state
   const [activeCompletingTrip, setActiveCompletingTrip] = useState(null);
@@ -33,7 +32,6 @@ export default function Trips() {
   const [fuelConsumed, setFuelConsumed] = useState(0);
   const [tollCost, setTollCost] = useState(120);
   const [otherCost, setOtherCost] = useState(0);
-  const [completeError, setCompleteError] = useState('');
 
   // Filter lists for the dropdown selectors
   const availableVehicles = vehicles.filter(v => v.status === 'Available');
@@ -69,11 +67,9 @@ export default function Trips() {
 
   const handleCreateDraft = (e) => {
     e.preventDefault();
-    setFormError('');
-    setFormSuccess('');
 
     if (!selectedVehicleReg || !selectedDriverLicense) {
-      setFormError('Please select a valid Available vehicle and driver.');
+      toast.error('Please select a valid Available vehicle and driver.');
       return;
     }
 
@@ -88,22 +84,24 @@ export default function Trips() {
     });
 
     if (res.success) {
-      setFormSuccess(`Draft Trip ${res.trip.id} created successfully! Dispatch it below.`);
+      toast.success(`Draft Trip ${res.trip.id} created successfully! Dispatch it below.`);
       // Reset form options
       setSource('Gandhinagar Depot');
       setDestination('Ahmedabad Hub');
       setCargoWeight(450);
       setPlannedDistance(38);
       setRevenue(15000);
+    } else {
+      toast.error(res.error || 'Failed to create trip');
     }
   };
 
   const handleDispatchDirect = (tripId) => {
-    setFormError('');
-    setFormSuccess('');
     const res = dispatchTrip(tripId);
     if (!res.success) {
-      alert(`Dispatch Error: ${res.error}`);
+      toast.error(`Dispatch Error: ${res.error}`);
+    } else {
+      toast.success('Trip dispatched successfully');
     }
   };
 
@@ -114,12 +112,10 @@ export default function Trips() {
     setFuelConsumed(Math.round(trip.plannedDistance / 8)); // ~8km per liter estimate
     setTollCost(120);
     setOtherCost(0);
-    setCompleteError('');
   };
 
   const handleCompleteSubmit = (e) => {
     e.preventDefault();
-    setCompleteError('');
 
     const res = completeTrip(
       activeCompletingTrip.id,
@@ -130,15 +126,17 @@ export default function Trips() {
     );
 
     if (res.success) {
+      toast.success('Trip completed successfully');
       setActiveCompletingTrip(null);
     } else {
-      setCompleteError(res.error);
+      toast.error(res.error || 'Failed to complete trip');
     }
   };
 
   const handleCancelTrip = (tripId) => {
     if (window.confirm(`Are you sure you want to cancel Trip ${tripId}?`)) {
       cancelTrip(tripId);
+      toast.success(`Trip ${tripId} cancelled`);
     }
   };
 
@@ -176,18 +174,6 @@ export default function Trips() {
           <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">
             Create Trip Order
           </h3>
-
-          {formError && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold rounded-lg animate-pulse">
-              ⚠️ {formError}
-            </div>
-          )}
-
-          {formSuccess && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold rounded-lg">
-              ✓ {formSuccess}
-            </div>
-          )}
 
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -447,11 +433,6 @@ export default function Trips() {
             </p>
 
             <form onSubmit={handleCompleteSubmit} className="space-y-4">
-              {completeError && (
-                <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold rounded-lg animate-pulse">
-                  ⚠️ {completeError}
-                </div>
-              )}
 
               <div>
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Final Odometer (km)</label>

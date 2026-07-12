@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import StatusBadge from '../components/StatusBadge';
 import { AppContext } from '../context/AppContext';
 import { 
@@ -18,7 +19,6 @@ export default function Drivers() {
   // Modal form states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formError, setFormError] = useState('');
 
   // Individual fields
   const [name, setName] = useState('');
@@ -43,7 +43,6 @@ export default function Drivers() {
     setTripsCompleted(0);
     setSafetyScore(100);
     setStatus('Available');
-    setFormError('');
     setIsModalOpen(true);
   };
 
@@ -57,7 +56,6 @@ export default function Drivers() {
     setTripsCompleted(d.tripsCompleted);
     setSafetyScore(d.safetyScore);
     setStatus(d.status);
-    setFormError('');
     setIsModalOpen(true);
   };
 
@@ -67,22 +65,23 @@ export default function Drivers() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFormError('');
 
     if (!name.trim() || !licenseNo.trim() || !expiry.trim()) {
-      setFormError('Name, License Number, and Expiry Date are required.');
+      toast.error('Name, License Number, and Expiry Date are required.');
       return;
     }
 
     if (isEditMode) {
       updateDriver(licenseNo, { name, category, expiry, contact, tripsCompleted, safetyScore, status });
+      toast.success('Driver updated successfully');
       setIsModalOpen(false);
     } else {
       const res = addDriver({ name, licenseNo, category, expiry, contact, tripsCompleted, safetyScore, status });
       if (res.success) {
+        toast.success('Driver added successfully');
         setIsModalOpen(false);
       } else {
-        setFormError(res.error);
+        toast.error(res.error || 'Failed to add driver');
       }
     }
   };
@@ -90,6 +89,7 @@ export default function Drivers() {
   const handleDelete = (license) => {
     if (window.confirm(`Are you sure you want to delete driver with license ${license}?`)) {
       deleteDriver(license);
+      toast.success('Driver deleted successfully');
     }
   };
 
@@ -452,11 +452,6 @@ export default function Drivers() {
             </h3>
             
             <form onSubmit={handleSubmit} className="space-y-5 text-left">
-              {formError && (
-                <div className="p-3 bg-rose-50 text-rose-700 text-[11px] font-bold border border-rose-200 rounded-xl flex items-center gap-2">
-                  <FiAlertTriangle /> {formError}
-                </div>
-              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">

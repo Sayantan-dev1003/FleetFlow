@@ -7,22 +7,22 @@
 ---
 
 ## 0. Setup Sanity Checks
-- [ ] Backend server starts cleanly, connects to PostgreSQL
-- [ ] `docker-compose up` (or equivalent) brings up API + DB with no errors
-- [ ] Seed data present: 4 roles, at least one demo user per role, a few sample vehicles/drivers
-- [ ] Frontend starts cleanly and successfully calls the backend (no CORS/env misconfig)
+- [ Done ] Backend server starts cleanly, connects to PostgreSQL
+- [ Done ] `docker-compose up` (or equivalent) brings up API + DB with no errors
+- [ Done ] Seed data present: 4 roles, at least one demo user per role, a few sample vehicles/drivers
+- [ Done ] Frontend starts cleanly and successfully calls the backend (no CORS/env misconfig)
 
 ---
 
 ## 1. Authentication & RBAC (Spec 3.1)
-- [ ] Login with valid email + password succeeds
-- [ ] Login with invalid credentials is rejected with a clear error message
-- [ ] Unauthenticated requests to any protected page/API are blocked (test by hitting a route directly with no token — not just checking the UI hides a link)
-- [ ] Session/JWT persists across a page refresh
-- [ ] Logout clears the session and returns to login
-- [ ] All 4 roles can log in successfully
-- [ ] Each role sees only the modules it's permitted (verify against whichever RBAC matrix was actually implemented)
-- [ ] A role attempting a forbidden **API call directly** (Postman/curl), not just a hidden UI button, gets a `403` — RBAC enforced server-side
+- [ DONE ] Login with valid email + password succeeds
+- [ DONE ] Login with invalid credentials is rejected with a clear error message
+- [ DONE ] Unauthenticated requests to any protected page/API are blocked (test by hitting a route directly with no token — not just checking the UI hides a link)
+- [ DONE ] Session/JWT persists across a page refresh
+- [ DONE ] Logout clears the session and returns to login
+- [ DONE ] All 4 roles can log in successfully
+- [ DONE ] Each role sees only the modules it's permitted (verify against whichever RBAC matrix was actually implemented)
+- [ DONE ] A role attempting a forbidden **API call directly** (Postman/curl), not just a hidden UI button, gets a `403` — RBAC enforced server-side
 
 ---
 

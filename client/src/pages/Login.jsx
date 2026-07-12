@@ -1,25 +1,30 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import { AppContext } from '../context/AppContext';
 
-export default function Login({ onBack }) {
+export default function Login({ initialTab = 'login' }) {
   const { login, registerUser, accountLocked } = useContext(AppContext);
+  const navigate = useNavigate();
   
   // Tab selector: 'login' or 'register'
-  const [activeTab, setActiveTab] = useState('login');
+  const [activeTab, setActiveTab] = useState(initialTab);
   
+  // Update tab if route changes
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
+
   // Login Form States
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginRole, setLoginRole] = useState('Dispatcher');
-  const [loginError, setLoginError] = useState('');
 
   // Register Form States
   const [registerName, setRegisterName] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerRole, setRegisterRole] = useState('FLEET_MANAGER');
-  const [registerError, setRegisterError] = useState('');
-  const [registerSuccess, setRegisterSuccess] = useState('');
 
   // Password Validation Check Helpers (Zod Aligned)
   const isMinLength = registerPassword.length >= 8;
@@ -30,30 +35,29 @@ export default function Login({ onBack }) {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    setLoginError('');
     const res = await login(loginEmail, loginPassword, loginRole);
     if (!res.success) {
-      setLoginError(res.error);
+      toast.error(res.error || 'Login failed');
+    } else {
+      toast.success('Login successful!');
     }
   };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    setRegisterError('');
-    setRegisterSuccess('');
 
     if (registerName.trim().length < 2) {
-      setRegisterError('Full Name must be at least 2 characters.');
+      toast.error('Full Name must be at least 2 characters.');
       return;
     }
 
     if (!registerEmail.includes('@')) {
-      setRegisterError('Please enter a valid email address.');
+      toast.error('Please enter a valid email address.');
       return;
     }
 
     if (!isPasswordValid) {
-      setRegisterError('Please satisfy all password complexity rules.');
+      toast.error('Please satisfy all password complexity rules.');
       return;
     }
 
@@ -65,33 +69,19 @@ export default function Login({ onBack }) {
     );
 
     if (res.success) {
-      setRegisterSuccess('Account registered successfully! Redirecting you into console session...');
+      toast.success('Account registered successfully! Redirecting you into console session...');
       // Form reset
       setRegisterName('');
       setRegisterEmail('');
       setRegisterPassword('');
     } else {
-      setRegisterError(res.error);
+      toast.error(res.error || 'Registration failed');
     }
   };
 
-  const handleQuickLogin = (selectedRole, selectedEmail) => {
-    setActiveTab('login');
-    setLoginRole(selectedRole);
-    setLoginEmail(selectedEmail);
-    setLoginPassword('password123');
-    setLoginError('');
-    
-    // Auto submit to make it even faster
-    setTimeout(async () => {
-      const res = await login(selectedEmail, 'password123', selectedRole);
-      if (!res.success) {
-        setLoginError(res.error);
-      }
-    }, 50);
-  };
-
- 
+  const handleTabChange = (tab) => {
+    navigate(`/${tab}`);
+  }; 
   return (
     <div className="flex h-screen w-screen bg-slate-50 font-sans overflow-hidden select-none animate-fadeIn">
       
@@ -146,36 +136,12 @@ export default function Login({ onBack }) {
       <div className="w-7/12 flex flex-col justify-center px-16 relative bg-white overflow-y-auto">
         
         {/* Back Button */}
-        {onBack && (
-          <button 
-            onClick={onBack}
-            className="absolute top-8 left-8 flex items-center gap-1 text-slate-400 hover:text-slate-800 transition-colors text-xs font-bold uppercase tracking-wider cursor-pointer"
-          >
-            <span>← Back to Home</span>
-          </button>
-        )}
-
-        {/* Global Error Banner */}
-        {((activeTab === 'login' && loginError) || (activeTab === 'register' && registerError)) && (
-          <div className="absolute top-8 right-8 border-2 border-dashed border-rose-300 bg-rose-50/90 text-rose-700 p-4 rounded-xl max-w-xs text-[11px] font-semibold animate-pulse z-10">
-            <p className="font-bold flex items-center gap-1 text-xs text-rose-800 uppercase tracking-wider">
-              ❌ Authentication Alert
-            </p>
-            <p className="mt-1 leading-relaxed font-semibold">
-              {activeTab === 'login' ? loginError : registerError}
-            </p>
-          </div>
-        )}
-
-        {/* Global Success Banner */}
-        {activeTab === 'register' && registerSuccess && (
-          <div className="absolute top-8 right-8 border-2 border-dashed border-emerald-300 bg-emerald-50/90 text-emerald-700 p-4 rounded-xl max-w-xs text-[11px] font-semibold z-10">
-            <p className="font-bold flex items-center gap-1 text-xs text-emerald-800 uppercase tracking-wider">
-              ✓ Registration Success
-            </p>
-            <p className="mt-1 leading-relaxed font-semibold">{registerSuccess}</p>
-          </div>
-        )}
+        <Link 
+          to="/"
+          className="absolute top-8 left-8 flex items-center gap-1 text-slate-400 hover:text-slate-800 transition-colors text-xs font-bold uppercase tracking-wider cursor-pointer"
+        >
+          <span>← Back to Home</span>
+        </Link>
 
         <div className="max-w-md w-full mx-auto py-8">
           
@@ -190,13 +156,13 @@ export default function Login({ onBack }) {
           {/* Form Switcher Tabs */}
           <div className="flex bg-slate-100 p-1 rounded-xl mt-6">
             <button
-              onClick={() => { setActiveTab('login'); setRegisterError(''); setRegisterSuccess(''); }}
+              onClick={() => handleTabChange('login')}
               className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${activeTab === 'login' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
             >
               Sign In
             </button>
             <button
-              onClick={() => { setActiveTab('register'); setLoginError(''); }}
+              onClick={() => handleTabChange('register')}
               className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${activeTab === 'register' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
             >
               Register

@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import StatusBadge from '../components/StatusBadge';
 import { AppContext } from '../context/AppContext';
 
@@ -13,7 +14,6 @@ export default function Fleet() {
   // Modal form states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formError, setFormError] = useState('');
 
   // Individual field states
   const [regNo, setRegNo] = useState('');
@@ -36,7 +36,6 @@ export default function Fleet() {
     setAcqCost(0);
     setStatus('Available');
     setRegion('Gujarat');
-    setFormError('');
     setIsModalOpen(true);
   };
 
@@ -51,7 +50,6 @@ export default function Fleet() {
     setAcqCost(v.acqCost);
     setStatus(v.status);
     setRegion(v.region || 'Gujarat');
-    setFormError('');
     setIsModalOpen(true);
   };
 
@@ -62,22 +60,23 @@ export default function Fleet() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFormError('');
 
     if (!regNo.trim() || !name.trim()) {
-      setFormError('Registration Number and Name/Model are required fields.');
+      toast.error('Registration Number and Name/Model are required fields.');
       return;
     }
 
     if (isEditMode) {
       updateVehicle(regNo, { name, type, capacity, odometer, acqCost, status, region });
+      toast.success('Vehicle updated successfully');
       setIsModalOpen(false);
     } else {
       const res = addVehicle({ regNo, name, type, capacity, odometer, acqCost, status, region });
       if (res.success) {
+        toast.success('Vehicle added successfully');
         setIsModalOpen(false);
       } else {
-        setFormError(res.error);
+        toast.error(res.error || 'Failed to add vehicle');
       }
     }
   };
@@ -85,6 +84,7 @@ export default function Fleet() {
   const handleDelete = (reg) => {
     if (window.confirm(`Are you sure you want to delete vehicle ${reg}?`)) {
       deleteVehicle(reg);
+      toast.success('Vehicle deleted successfully');
     }
   };
 
@@ -245,11 +245,6 @@ export default function Fleet() {
             </h3>
             
             <form onSubmit={handleSubmit} className="space-y-4 text-left">
-              {formError && (
-                <div className="p-2.5 bg-rose-50 text-rose-700 text-[10px] font-bold border border-rose-200 rounded-lg">
-                  ⚠️ {formError}
-                </div>
-              )}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>

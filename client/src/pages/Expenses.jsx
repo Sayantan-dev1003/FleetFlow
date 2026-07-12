@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { toast } from 'react-hot-toast';
 import { AppContext } from '../context/AppContext';
 
 export default function Expenses() {
@@ -37,7 +38,10 @@ export default function Expenses() {
 
   const handleLogFuel = (e) => {
     e.preventDefault();
-    if (!fuelVehicle) return;
+    if (!fuelVehicle) {
+      toast.error('Please select a vehicle');
+      return;
+    }
 
     addFuelLogManual({
       vehicleRegNo: fuelVehicle,
@@ -47,12 +51,15 @@ export default function Expenses() {
     });
 
     setShowFuelForm(false);
-    alert('Fuel log registered successfully!');
+    toast.success('Fuel log registered successfully!');
   };
 
   const handleLogExpense = (e) => {
     e.preventDefault();
-    if (!expVehicle) return;
+    if (!expVehicle) {
+      toast.error('Please select a vehicle');
+      return;
+    }
 
     addExpenseManual({
       tripId: expTrip,
@@ -63,7 +70,7 @@ export default function Expenses() {
     });
 
     setShowExpenseForm(false);
-    alert('Operational expense registered successfully!');
+    toast.success('Operational expense registered successfully!');
   };
 
   // Compute calculations

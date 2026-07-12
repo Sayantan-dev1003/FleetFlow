@@ -20,25 +20,30 @@ export default function Sidebar({ userRole }) {
 
   // Filter sidebar options based on role access rules, now with icons
   const getAllowedItems = () => {
+    const dashboardItem = { id: 'dashboard', label: 'Dashboard', icon: <FiGrid className="text-lg" /> };
+    
     switch (userRole) {
       case 'Fleet Manager':
         return [
+          dashboardItem,
           { id: 'fleet', label: 'Fleet Registry', icon: <FiTruck className="text-lg" /> },
           { id: 'maintenance', label: 'Maintenance Log', icon: <FiTool className="text-lg" /> },
           { id: 'trips', label: 'Trip Dispatcher', icon: <FiMap className="text-lg" /> }
         ];
       case 'Driver':
         return [
-          { id: 'dashboard', label: 'Dashboard', icon: <FiGrid className="text-lg" /> },
+          dashboardItem,
           { id: 'trips', label: 'Trip Dispatcher', icon: <FiMap className="text-lg" /> }
         ];
       case 'Safety Officer':
         return [
+          dashboardItem,
           { id: 'drivers', label: 'Drivers & Safety', icon: <FiUsers className="text-lg" /> },
           { id: 'settings', label: 'Compliance Panel', icon: <FiShield className="text-lg" /> }
         ];
       case 'Financial Analyst':
         return [
+          dashboardItem,
           { id: 'expenses', label: 'Fuel & Expenses', icon: <FiDollarSign className="text-lg" /> },
           { id: 'analytics', label: 'Reports & Analytics', icon: <FiPieChart className="text-lg" /> }
         ];

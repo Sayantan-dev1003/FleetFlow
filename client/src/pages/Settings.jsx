@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { toast } from 'react-hot-toast';
 import { AppContext } from '../context/AppContext';
 import { 
   FiSettings, FiShield, FiCheck, FiEye, 
@@ -13,10 +14,6 @@ export default function Settings() {
   const [depotName, setDepotName] = useState('');
   const [currency, setCurrency] = useState('');
   const [distanceUnit, setDistanceUnit] = useState('');
-  
-  // Feedback states
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   // Check role authorization (Only Fleet Managers can modify)
   const isFleetManager = user?.role === 'Fleet Manager';
@@ -32,16 +29,14 @@ export default function Settings() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
 
     if (!isFleetManager) {
-      setError('Access Denied: Only Fleet Managers are authorized to modify depot settings.');
+      toast.error('Access Denied: Only Fleet Managers are authorized to modify depot settings.');
       return;
     }
 
     if (!depotName.trim()) {
-      setError('Depot identification name cannot be empty.');
+      toast.error('Depot identification name cannot be empty.');
       return;
     }
 
@@ -52,10 +47,9 @@ export default function Settings() {
     });
 
     if (res.success) {
-      setSuccess('Depot settings committed successfully.');
-      setTimeout(() => setSuccess(''), 4000);
+      toast.success('Depot settings committed successfully.');
     } else {
-      setError(res.error || 'An error occurred while saving.');
+      toast.error(res.error || 'An error occurred while saving.');
     }
   };
 
@@ -93,21 +87,6 @@ export default function Settings() {
           </div>
           <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">General Params</h3>
         </div>
-
-        {/* Feedback Alerts */}
-        {error && (
-          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold rounded-xl flex items-center gap-2 animate-shake">
-            <FiAlertTriangle className="shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {success && (
-          <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold rounded-xl flex items-center gap-2 animate-pulse">
-            <FiCheckCircle className="shrink-0" />
-            <span>{success}</span>
-          </div>
-        )}
 
         {/* Restricted warning for non-managers */}
         {!isFleetManager && (
