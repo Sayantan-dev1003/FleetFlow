@@ -54,13 +54,13 @@ export default function Dashboard() {
     : 0;
 
   const kpis = [
-    { title: "Active Vehicles", value: activeVehiclesCount, color: "border-blue-500" },
-    { title: "Available Vehicles", value: availableVehiclesCount, color: "border-emerald-500" },
-    { title: "Vehicles In Maint.", value: inShopCount, color: "border-amber-500" },
-    { title: "Active Trips", value: activeTripsCount, color: "border-indigo-500" },
-    { title: "Pending Trips", value: pendingTripsCount, color: "border-purple-500" },
-    { title: "Drivers On Duty", value: driversOnDuty, color: "border-sky-500" },
-    { title: "Fleet Utilization", value: `${fleetUtilization}%`, color: "border-teal-500" },
+    { title: "Active Vehicles", value: activeVehiclesCount, color: "border-blue-500 bg-gradient-to-br from-blue-50/50 to-white text-blue-900" },
+    { title: "Available Vehicles", value: availableVehiclesCount, color: "border-emerald-500 bg-gradient-to-br from-emerald-50/50 to-white text-emerald-900" },
+    { title: "Vehicles In Maint.", value: inShopCount, color: "border-amber-500 bg-gradient-to-br from-amber-50/50 to-white text-amber-900" },
+    { title: "Active Trips", value: activeTripsCount, color: "border-indigo-500 bg-gradient-to-br from-indigo-50/50 to-white text-indigo-900" },
+    { title: "Pending Trips", value: pendingTripsCount, color: "border-purple-500 bg-gradient-to-br from-purple-50/50 to-white text-purple-900" },
+    { title: "Drivers On Duty", value: driversOnDuty, color: "border-sky-500 bg-gradient-to-br from-sky-50/50 to-white text-sky-900" },
+    { title: "Fleet Utilization", value: `${fleetUtilization}%`, color: "border-teal-500 bg-gradient-to-br from-teal-50/50 to-white text-teal-900" },
   ];
 
   // Recent trips table list
@@ -132,7 +132,7 @@ export default function Dashboard() {
       {/* 7 KPI Box Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
         {kpis.map((kpi, idx) => (
-          <div key={idx} className={`bg-white p-4 rounded-xl border-l-4 border border-slate-200 shadow-sm ${kpi.color} hover:shadow-md transition-all`}>
+          <div key={idx} className={`p-4 rounded-xl border-l-4 border border-slate-200/60 shadow-sm ${kpi.color} hover:scale-[1.03] hover:shadow-md transition-all duration-300`}>
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider truncate">{kpi.title}</p>
             <p className="text-2xl font-black text-slate-900 mt-1">{kpi.value}</p>
           </div>

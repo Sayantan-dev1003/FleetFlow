@@ -1,8 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import Login from './pages/Login';
+import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Fleet from './pages/Fleet';
 import Drivers from './pages/Drivers';
@@ -15,11 +16,17 @@ import { AppContext } from './context/AppContext';
 
 export default function App() {
   const { user } = useContext(AppContext);
+  const [guestView, setGuestView] = useState('landing'); // 'landing' or 'login'
   const isAuthenticated = !!user;
   const userRole = user?.role;
 
+  // Guest Routing Engine: Hero Landing vs Secure Console Login
   if (!isAuthenticated) {
-    return <Login />;
+    if (guestView === 'landing') {
+      return <Landing onLaunch={() => setGuestView('login')} />;
+    } else {
+      return <Login onBack={() => setGuestView('landing')} />;
+    }
   }
 
   return (
