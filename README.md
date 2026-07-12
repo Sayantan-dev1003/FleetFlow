@@ -277,10 +277,10 @@ After completing the setup, use any of the following credentials to log in and t
 
 | Role | Email | Password |
 |---|---|---|
-| **Fleet Manager** | `manager@transitops.in` | `password123` |
-| **Driver** | `Raven.k@transitops.in` | `password123` |
-| **Safety Officer** | `safety@transitops.in` | `password123` |
-| **Financial Analyst** | `analyst@transitops.in` | `password123` |
+| **Fleet Manager** | `manager@fleetflow.com` | `Manager@123` |
+| **Driver** | `driver@fleetflow.com` | `Driver@123` |
+| **Safety Officer** | `safety@fleetflow.com` | `Safety@123` |
+| **Financial Analyst** | `finance@fleetflow.com` | `Finance@123` |
 
 *(Note: You can also click the Quick Login Assistant cards directly on the `/login` page to switch roles instantly without typing!)*
 

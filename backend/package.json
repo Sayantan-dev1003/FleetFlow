@@ -12,7 +12,10 @@
     "studio": "prisma studio",
     "generate": "prisma generate",
     "docker:up": "docker-compose up --build",
-    "docker:down": "docker-compose down"
+    "docker:down": "docker-compose down",
+    "test": "jest",
+    "test:unit": "cross-env NODE_ENV=test jest --config jest.unit.config.js",
+    "test:e2e": "cross-env NODE_ENV=test jest --config jest.e2e.config.js --runInBand"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
@@ -32,8 +35,12 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
+    "jest": "^30.4.2",
+    "jest-mock-extended": "^4.0.1",
     "nodemon": "^3.1.4",
-    "prisma": "^5.14.0"
+    "prisma": "^5.14.0",
+    "supertest": "^7.2.2"
   },
   "engines": {
     "node": ">=18.0.0"
