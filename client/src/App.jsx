@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import Login from './pages/Login';
@@ -10,16 +10,16 @@ import Maintenance from './pages/Maintenance';
 import Expenses from './pages/Expenses';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import { AppContext } from './context/AppContext';
 
 export default function App() {
-  // Hackathon flow verification session state checks
-  const [isAuthenticated, setIsAuthenticated] = useState(true); 
-  const [activePage, setActivePage] = useState('dashboard');
-  const [userRole, setUserRole] = useState('Dispatcher');
+  const { user, activePage, setActivePage } = useContext(AppContext);
+  const isAuthenticated = !!user;
+  const userRole = user?.role;
 
   // Explicit Auth Guard matching Mockup validation metrics
   if (!isAuthenticated) {
-    return <Login onLoginSuccess={() => setIsAuthenticated(true)} />;
+    return <Login />;
   }
 
   // Pure clean dynamic conditional engine mappings router
@@ -58,7 +58,7 @@ export default function App() {
 
       {/* Primary display core injection framework window shell node */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Topbar userSession="Raven K." />
+        <Topbar userSession={user?.name || "User"} />
         
         {/* Active Route View Viewport container block configuration */}
         <main className="flex-1 overflow-y-auto p-6 max-w-[1600px] w-full mx-auto">
